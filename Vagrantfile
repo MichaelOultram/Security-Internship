@@ -12,7 +12,7 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "lucid32"
+  config.vm.box = "ubuntu/trusty64"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -24,6 +24,7 @@ Vagrant.configure("2") do |config|
   # accessing "localhost:8080" will access port 80 on the guest machine.
   # config.vm.network "forwarded_port", guest: 80, host: 8080
   config.vm.network "forwarded_port", guest: 80, host: 8080
+  config.vm.network :public_network
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -44,13 +45,19 @@ Vagrant.configure("2") do |config|
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
   #
-  # config.vm.provider "virtualbox" do |vb|
-  #   # Display the VirtualBox GUI when booting the machine
-  #   vb.gui = true
-  #
-  #   # Customize the amount of memory on the VM:
-  #   vb.memory = "1024"
-  # end
+  config.vm.provider "virtualbox" do |vb|
+    # Display the VirtualBox GUI when booting the machine
+    vb.gui = false
+
+    # Customize the amount of memory on the VM:
+    vb.memory = "1024"
+
+    # Customize the amount of video memory the VM uses:
+    vb.customize ["modifyvm", :id, "--vram", "256"]
+
+    # Enable Internet
+    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+  end
   #
   # View the documentation for the provider you are using for more
   # information on available options.
@@ -69,5 +76,7 @@ Vagrant.configure("2") do |config|
   #   apt-get update
   #   apt-get install -y apache2
   # SHELL
+
+  # Use Puppet
   config.vm.provision :puppet
 end

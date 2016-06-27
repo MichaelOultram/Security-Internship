@@ -1,17 +1,22 @@
-exec { "apt-get update":
+# Refreshes local package index
+exec { "apt-update":
+  command => "apt-get update",
   path => "/usr/bin",
 }
-package { "apache2":
-  ensure  => present,
-  require => Exec["apt-get update"],
+
+# Installs packages requires for using the vm via gnome
+$gui_packages = [ 'gdm', 'gnome', 'virtualbox-guest-dkms', 'virtualbox-guest-utils', 'virtualbox-guest-x11' ]
+package { $gui_packages:
+  ensure => 'installed',
+  require => Exec["apt-update"],
 }
-service { "apache2":
+service { "gdm":
   ensure => running,
-  require => Package["apache2"],
+  require => Package[$gui_packages],
 }
-file { "/var/www/sample-webapp":
+
+# Allows puppet modules to be accessed
+file { "/home/vagrant/manifests":
   ensure  => "link",
-  target  => "/vagrant/sample-webapp",
-  require => Package["apache2"],
-  notify  => Service["apache2"],
+  target  => "/vagrant/manifests",
 }
