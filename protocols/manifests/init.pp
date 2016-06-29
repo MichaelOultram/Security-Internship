@@ -1,8 +1,9 @@
-class protocols ($protocols) { 
+class protocols ($protocols) {
 
 # one-off defined resource type, in
 # /etc/puppetlabs/code/environments/production/modules/puppet/manifests/binary/symlink.pp
 define puppet::binary::symlink ($protocol = $title) {
+  $token = gentoken("ex1${protocol}")
   file {"${protocol}":
     path => "/tmp/${protocol}.java",
     content => template("protocols/${protocol}.java.erb"),
@@ -26,4 +27,3 @@ define puppet::binary::symlink ($protocol = $title) {
 
 puppet::binary::symlink { $protocols: }
 }
-
