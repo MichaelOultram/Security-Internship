@@ -7,13 +7,13 @@
 //This program runs the server side of the following protocol:
 
 //1. C -> S: g^x
-//2. S -> C: g^y,  
+//2. S -> C: g^y,
 //3. C -> S: {  Nc  }_key(g^xy)
 //4. S -> C: {  {Nc+1}_Kcs, Ns  }_key(g^xy)
 //5. C -> S: {  {Ns+1}_Kcs  }_key(g^xy)
 //6. S -> C: {secret}_key(g^xy)
 
-//Encryption is 128-bit AES, CBC, PKCS5 padding, nonces are ints. 
+//Encryption is 128-bit AES, CBC, PKCS5 padding, nonces are ints.
 //g^x, and g^y are sent as certificates, length sent as int first.
 //The first 128-bits of g^xy are used as the AES key.
 //Values of p & g for Diffie-Hellman were found using generateDHprams()
@@ -48,7 +48,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.DHParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-public class Protocol2Server {
+public class Protocol2 {
 
 	static int portNo = 11338;
 	static String hexKey="f511e3d44f4beb284421f3eb52d19f63";
@@ -58,10 +58,10 @@ public class Protocol2Server {
 
 	public static void main(String[] args) {
 
-		// Listen for connections, when client connects spin off a 
-		// thread to run the protocol over that connection and go 
+		// Listen for connections, when client connects spin off a
+		// thread to run the protocol over that connection and go
 		// back to listening for new connections
-		try { 
+		try {
 			ServerSocket listening = new ServerSocket(portNo);
 			while (true) {
 				// For each connection spin off a new protocol instance.
@@ -95,7 +95,7 @@ public class Protocol2Server {
 				encAEScipher.init(Cipher.ENCRYPT_MODE, aesKey);
 			} catch (Exception e) {
 				System.out.println("Doh "+e);
-			}			
+			}
 		}
 
 		public void run() {
@@ -163,12 +163,12 @@ public class Protocol2Server {
 
 					//Check nonce value
 					if (serverNonce+1!=serverNonceReply) {
-						if (debug) System.out.println("Nonces dont match"); 
+						if (debug) System.out.println("Nonces dont match");
 						outStream.write("Nonces dont match".getBytes());
 						myConnection.close();
 						return;
 					} else {
-						if (debug) System.out.println("Nonces match"); 
+						if (debug) System.out.println("Nonces match");
 					}
 
 					//Protocol Step 6
@@ -198,7 +198,7 @@ public class Protocol2Server {
 				} catch (InvalidAlgorithmParameterException e) {
 					System.out.println(e);// Not going to happen, DH Spec hard wired
 					e.printStackTrace();
-				} 
+				}
 
 			} catch (IOException e) {
 				//Nothing we can do about this one
@@ -207,7 +207,7 @@ public class Protocol2Server {
 			}
 		}
 
-		// This method sets decAESsessioncipher & encAESsessioncipher 
+		// This method sets decAESsessioncipher & encAESsessioncipher
 		private void calculateSessionKey(PrivateKey y, PublicKey gToTheX)  {
 			try {
 				// Find g^xy
@@ -237,32 +237,32 @@ public class Protocol2Server {
 
 		@SuppressWarnings("unused")
 		public static void generateDHprams() throws NoSuchAlgorithmException, InvalidParameterSpecException {
-			AlgorithmParameterGenerator paramGen = AlgorithmParameterGenerator.getInstance("DH");   
-			paramGen.init(1024);   
-			//Generate the parameters   
-			AlgorithmParameters params = paramGen.generateParameters();   
-			DHParameterSpec dhSpec = (DHParameterSpec)params.getParameterSpec(DHParameterSpec.class);   
+			AlgorithmParameterGenerator paramGen = AlgorithmParameterGenerator.getInstance("DH");
+			paramGen.init(1024);
+			//Generate the parameters
+			AlgorithmParameters params = paramGen.generateParameters();
+			DHParameterSpec dhSpec = (DHParameterSpec)params.getParameterSpec(DHParameterSpec.class);
 			System.out.println("These are some good values to use for p & g with Diffie Hellman");
 			System.out.println("p: "+dhSpec.getP());
 			System.out.println("g: "+dhSpec.getG());
 
 		}
 
-		private static String byteArrayToHexString(byte[] data) { 
+		private static String byteArrayToHexString(byte[] data) {
 			StringBuffer buf = new StringBuffer();
-			for (int i = 0; i < data.length; i++) { 
+			for (int i = 0; i < data.length; i++) {
 				int halfbyte = (data[i] >>> 4) & 0x0F;
 				int two_halfs = 0;
-				do { 
-					if ((0 <= halfbyte) && (halfbyte <= 9)) 
+				do {
+					if ((0 <= halfbyte) && (halfbyte <= 9))
 						buf.append((char) ('0' + halfbyte));
-					else 
+					else
 						buf.append((char) ('a' + (halfbyte - 10)));
 					halfbyte = data[i] & 0x0F;
 				} while(two_halfs++ < 1);
-			} 
+			}
 			return buf.toString();
-		} 
+		}
 
 		private static byte[] hexStringToByteArray(String s) {
 			int len = s.length();

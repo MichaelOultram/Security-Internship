@@ -38,25 +38,23 @@ class protocols {
 				recurse => true,
 				ensure => directory,
 			}
-          # Creates every protocol start
-            exec {"start_server${protocol}":
-            command => "echo 'java ${protocol} &' >> startprotocol",
-            path => '/usr/bin/:/bin',
-            cwd => '/etc/init.d',
-            require => File["startprotocol"],
-            }
+      # Creates every protocol start
+      exec { "start_server${protocol}":
+        command => "echo 'java ${protocol} &' >> startprotocol",
+        path => '/usr/bin/:/bin',
+        cwd => '/etc/init.d',
+        require => File["startprotocol"],
+      }
 		}
 	}
-      # Starts every protocols on start of VM
-      file {"startprotocol":
-
-      path => "/etc/init.d/startprotocol",
-      content => template("protocols/startprotocol.erb"),
-      owner => root,
-      group => root,
-      mode => '0700',
-      #before => Exec["start_server${protocol}"],
-        }
+  # Starts every protocols on start of VM
+  file {"startprotocol":
+  	path => "/etc/init.d/startprotocol",
+  	content => template("protocols/startprotocol.erb"),
+  	owner => root,
+  	group => root,
+  	mode => '0700',
+  }
 
 	# Setup all protocol servers
 	$protocolsArray = split($::protocols, '[,]')
