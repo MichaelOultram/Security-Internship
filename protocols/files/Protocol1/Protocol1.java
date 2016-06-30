@@ -30,7 +30,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
-public class Protocol1Server {
+public class Protocol1 {
 
 	static int portNo = 11337;
 	static String hexKey="hex_key";

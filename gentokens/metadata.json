@@ -1,5 +1,5 @@
 {
-  "name": "username-protocols",
+  "name": "username-gentokens",
   "version": "0.1.0",
   "author": "username",
   "summary": null,
@@ -8,7 +8,6 @@
   "issues_url": null,
   "project_page": null,
   "dependencies": [
-    {"version_requirement":">= 1.0.0","name":"puppetlabs-java"},
-    {"version_requirement":">= 0.1.0","name":"username-gentokens"}
+    {"version_requirement":">= 1.0.0","name":"puppetlabs-stdlib"}
   ]
 }

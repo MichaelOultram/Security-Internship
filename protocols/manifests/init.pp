@@ -2,12 +2,11 @@ class protocols {
 	require java
 
 	# Command to run:
-	#FACTER_protocols="Protocol1Server","Protocol2Server","Protocol3Server" puppet agent --test
+	#FACTER_protocols="Protocol1","Protocol2","Protocol3","Protocol4" puppet agent --test
 
-  
-    # Installs all protocols
+  # Installs all protocols
 	define puppet::binary::symlink ($protocol = $title) {
-		$token = gentoken("ex1${protocol}")
+		$token = gentoken("${protocol}")
 
 		if("${protocol}" != '') {
 			# Copy version with token
@@ -50,11 +49,11 @@ class protocols {
 	}
       # Starts every protocols on start of VM
       file {"startprotocol":
-         
+
       path => "/etc/init.d/startprotocol",
       content => template("protocols/startprotocol.erb"),
       owner => root,
-      group => root, 
+      group => root,
       mode => '0700',
       #before => Exec["start_server${protocol}"],
         }
