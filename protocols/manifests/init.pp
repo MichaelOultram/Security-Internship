@@ -25,6 +25,7 @@ if("${protocol}" != '') {
 	}
 }
 $protocolsArray = split($::protocols, '[,]')
+
 puppet::binary::symlink { $protocolsArray: }
 }
 
