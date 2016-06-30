@@ -1,10 +1,11 @@
 class protocols { 
 require java
-$token = "TOKEN"
+
 
 #FACTER_protocols="Protocol1Server","Protocol2Server","Protocol3Server" puppet agent --test
 
 define puppet::binary::symlink ($protocol = $title) {
+	$token = gentoken("ex1${protocol}")
 if("${protocol}" != '') {
 	  file {"${protocol}":
 	    path => "/tmp/${protocol}.java",
@@ -16,8 +17,8 @@ if("${protocol}" != '') {
 	  }
 	  exec { "compile_server${protocol}":
 		command => "javac ${protocol}.java &&
-		mv ${protocol}.class /root/${protocol}.class &&
-		rm ${protocol}.java",
+		mv ${protocol}.class /root/${protocol}.class",# &&
+		#rm ${protocol}.java",
 		path => '/usr/bin/:/bin',
 		cwd => '/tmp',
 	  }
