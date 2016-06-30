@@ -2,11 +2,11 @@ class wireshark {
 
 	package { 'wireshark':
 		ensure => present,
-	  	before => File["/home/charlie/wireshark"],
+	  before => File["/home/charlie/wireshark"],
 	}
 
-	file { '/home/charlie/wireshark' :
-    		ensure => 'link',
-    		target => '/usr/bin/wireshark',
+	file { '/home/charlie/wireshark':
+		ensure => 'link',
+		target => '/usr/bin/wireshark',
   }
 }

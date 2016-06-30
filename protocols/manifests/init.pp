@@ -1,5 +1,12 @@
 class protocols {
 	require java
+	include wireshark
+	include gentoken
+
+	# Create /root/tmp so nobody but root can access it
+	file { "/root/tmp":
+		ensure => directory,
+	}
 
 	# Command to run:
 	#FACTER_protocols="Protocol1","Protocol2","Protocol3","Protocol4" puppet agent --test
@@ -11,21 +18,23 @@ class protocols {
 		if("${protocol}" != '') {
 			# Copy version with token
 		  file {"${protocol}_token":
-		    path => "/tmp/${protocol}.java",
+		    path => "/root/tmp/${protocol}.java",
 		    content => template("protocols/${protocol}.java.erb"),
 		    owner => 'root',
 		    group => 'root',
 		    mode => '0700',
 		    before => Exec["${protocol}_compile"],
+				require => File['/root/tmp'],
 		  }
 
 			# Compile Server and remove source code
 		  exec { "${protocol}_compile":
 				command => "javac ${protocol}.java &&
 				mv ${protocol}.class /root/${protocol}.class &&
-				rm /tmp/${protocol}.java",
+				rm /root/tmp/${protocol}.java",
 				path => '/usr/bin/:/bin',
-				cwd => '/tmp',
+				cwd => '/root/tmp',
+				require => File['/root/tmp'],
 		  }
 
 			# Copy version without token
