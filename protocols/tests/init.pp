@@ -10,4 +10,6 @@
 # http://docs.puppetlabs.com/guides/tests_smoke.html
 #
 
-include protocols
+class { 'protocols': 
+	protocols => ["Protocol1Server", "Protocol2Server", "Protocol3Server"],
+      }
