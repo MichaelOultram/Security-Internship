@@ -48,21 +48,25 @@ class protocols {
 		}
 
 	# Create Charlie Account
-	group { "charlie_grp":
+	group { "charlie":
 		ensure => "present",
-		before => User["charlie_usr"],
+		before => User["charlie"],
 	}
-	user { 'charlie_usr':
+	user { 'charlie':
 		ensure   => 'present',
 		home     => '/home/charlie',
 		groups   => "charlie",
 		password => 'charlie99',
+		password_max_age => '99999',
+      		password_min_age => '0',
 		shell    => '/bin/bash',
+		gid      => '001',
+		uid	 => '505',
 	}
 	file { "charlie_home":
 		path    => "/home/charlie",
 		owner   => "charlie",
 		ensure  => directory,
-		require => User['charlie_usr'],
+		require => User['charlie'],
 	}
 }
