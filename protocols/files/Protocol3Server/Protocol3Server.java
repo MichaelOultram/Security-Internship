@@ -23,7 +23,7 @@ public class Protocol3Server {
 		{
 			System.out.println("Hello from my Chiquita Phone");
 		}
-		System.out.println("<%= @token %>");
+		System.out.println("token");
 	}
 
 }
