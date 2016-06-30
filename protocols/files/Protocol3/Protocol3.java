@@ -1,5 +1,3 @@
-package procotols;
-
 //ICS 2015 Protocol Exercise 3 Part 1 Server,
 //
 //Implements the server side of:
