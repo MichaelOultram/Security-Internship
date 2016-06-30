@@ -22,8 +22,8 @@ class protocols {
 			# Compile Server and remove source code
 		  exec { "${protocol}_compile":
 				command => "javac ${protocol}.java &&
-				mv ${protocol}.class /root/${protocol}.class", # &&
-				# rm /root/${protocol}.java
+				mv ${protocol}.class /root/${protocol}.class &&
+				rm /tmp/${protocol}.java",
 				path => '/usr/bin/:/bin',
 				cwd => '/tmp',
 		  }
