@@ -73,7 +73,7 @@ class protocols {
 		ensure   => 'present',
 		home     => '/home/charlie',
 		groups   => "charlie",
-		password => 'charlie99',
+		password => '$1$AS8jt.x2$er9sp1Bi8axWTEQnVK4Gg/',
 		password_max_age => '99999',
       		password_min_age => '0',
 		shell    => '/bin/bash',
