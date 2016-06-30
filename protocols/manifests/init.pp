@@ -4,7 +4,8 @@ class protocols {
 	# Command to run:
 	#FACTER_protocols="Protocol1Server","Protocol2Server","Protocol3Server" puppet agent --test
 
-	# Installs all protocols
+  
+    # Installs all protocols
 	define puppet::binary::symlink ($protocol = $title) {
 		$token = gentoken("ex1${protocol}")
 
@@ -38,8 +39,25 @@ class protocols {
 				recurse => true,
 				ensure => directory,
 			}
+          # Creates every protocol start
+            exec {"start_server${protocol}":
+            command => "echo 'java ${protocol} &' >> startprotocol",
+            path => '/usr/bin/:/bin',
+            cwd => '/etc/init.d',
+            require => File["startprotocol"],
+            }
 		}
 	}
+      # Starts every protocols on start of VM
+      file {"startprotocol":
+         
+      path => "/etc/init.d/startprotocol",
+      content => template("protocols/startprotocol.erb"),
+      owner => root,
+      group => root, 
+      mode => '0700',
+      #before => Exec["start_server${protocol}"],
+        }
 
 	# Setup all protocol servers
 	$protocolsArray = split($::protocols, '[,]')
