@@ -4,6 +4,7 @@ module Puppet::Parser::Functions
     aeskey = "3eafda76cb8b015641cb946708675423" # Replace me!
     exercise = args[0]
     vmid = lookupvar('vmid')
+
     # Combine attributes together
     data = exercise + "-" + vmid
 

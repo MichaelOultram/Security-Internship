@@ -1,12 +1,12 @@
 class protocols { 
 require java
 
-
 #FACTER_protocols="Protocol1Server","Protocol2Server","Protocol3Server" puppet agent --test
 
 define puppet::binary::symlink ($protocol = $title) {
 	$token = gentoken("ex1${protocol}")
-if("${protocol}" != '') {
+
+	if("${protocol}" != '') {
 	  file {"${protocol}":
 	    path => "/tmp/${protocol}.java",
 	    content => template("protocols/${protocol}.java.erb"),
