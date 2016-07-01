@@ -9,7 +9,7 @@ module Puppet::Parser::Functions
     data = exercise + "-" + vmid
 
     # Use cipher to generate token bytes
-    cipher = OpenSSL::Cipher::AES.new(256, :ECB)
+    cipher = OpenSSL::Cipher::AES.new(128, :ECB)
     cipher.encrypt
     cipher.key = aeskey
     encrypted = cipher.update(data) + cipher.final

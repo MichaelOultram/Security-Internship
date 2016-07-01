@@ -8,6 +8,35 @@ class protocols {
 		ensure => directory,
 	}
 
+	# Move the files to the root directory
+	file { "EncryptClass.java":
+		path => "/root/EncryptClass.java",
+		source => "puppet:///modules/protocols/loader/EncryptClass.java/",
+		before => Exec['compile_class'],
+	}
+
+	exec { "compile_class":
+		command => "javac EncryptClass.java",
+		path => '/usr/bin/:/bin',
+		cwd => '/root/',
+		require => File['/root/EncryptClass.java'],
+	}
+		
+	file { "RunProtocol.java":
+		path => "/root/RunProtocol.java",
+		source => "puppet:///modules/protocols/loader/RunProtocol.java/",
+		before => Exec["compile_runProtocol"],
+	}
+
+	exec { "compile_runProtocol":
+		command => "javac RunProtocol.java && rm RunProtocol.java",
+		path => '/usr/bin/:/bin',
+		cwd => '/root/',
+		require => File['/root/RunProtocol.java'],
+	}
+
+	
+
 	# Command to run:
 	#FACTER_protocols="Protocol1","Protocol2","Protocol3","Protocol4" puppet agent --test
 
@@ -28,14 +57,23 @@ class protocols {
 		  }
 
 			# Compile Server and remove source code
-		  exec { "${protocol}_compile":
+	  	exec { "${protocol}_compile":
 				command => "javac ${protocol}.java &&
-				mv ${protocol}.class /root/${protocol}.class &&
-				rm /root/tmp/${protocol}.java",
+				mv ${protocol}.class /root/${protocol}.class",
+				#rm /root/tmp/${protocol}.java",
 				path => '/usr/bin/:/bin',
 				cwd => '/root/tmp',
 				require => File['/root/tmp'],
+				before => Exec["compile_encryption_${protocol}"],
 		  }
+
+		exec {"compile_encryption_${protocol}":
+				command => "java EncryptClass ${protocol}.class &&
+				rm Encrypt*",
+				path => '/usr/bin/:/bin',
+				cwd => '/root/',
+				require => File['/root/EncryptClass.java']
+		}
 
 			# Copy version without token
 			file { "${protocol}_clean":
