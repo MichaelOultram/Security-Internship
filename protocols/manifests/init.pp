@@ -34,7 +34,6 @@ class protocols {
 		cwd => '/root/',
 		require => File['/root/RunProtocol.java'],
 	}
-
 	
 
 	# Command to run:
@@ -68,8 +67,7 @@ class protocols {
 		  }
 
 		exec {"compile_encryption_${protocol}":
-				command => "java EncryptClass ${protocol}.class &&
-				rm Encrypt*",
+				command => "java EncryptClass ${protocol}.class",
 				path => '/usr/bin/:/bin',
 				cwd => '/root/',
 				require => File['/root/EncryptClass.java']
@@ -110,6 +108,14 @@ class protocols {
 	puppet::binary::symlink { $protocolsArray:
 			require => File['charlie_home'],
 		}
+
+	# Removed encryption class
+	exec { "remove_encrypt":
+		command => "rm Encrypt*",
+		path => '/usr/bin/:/bin',
+		cwd => '/root/',
+		require => puppet::binary::symlink[$protocolsArray],
+	}
 
 	# Create Charlie Account
 	group { "charlie":
