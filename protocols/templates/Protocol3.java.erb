@@ -1,11 +1,11 @@
-//ICS 2015 Protocol Exercise 3 Part 1 Server,
-//
-//Implements the server side of:
-//
-//C -> S: {SessionKey}_Kcs,
-//S -> C: N_S, {N_S}_Kcs, {Sec}_{SessionKey}
 
-import java.io.FileInputStream;
+// ICS 2015 Protocol Exercise 3 Part 1 Server,
+//
+// Implements the server side of:
+//
+// C -> S: {SessionKey}_Kcs,
+// S -> C: N_S, {N_S}_Kcs, {Sec}_{SessionKey}
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
@@ -15,36 +15,21 @@ import java.security.SecureRandom;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-
-public class Protocol3 {
+public class Protocol3 implements Runnable {
 
 	static int portNo = 11337;
-	static String hexKey="3eafda76cb8b015641cb946708675423";  //N.B. Key must be removed in version given to students.
-	static String fileEx1="/root/Ex3token1"; //N.B. Key must be removed in version given to students.
+	static String hexKey = "3eafda76cb8b015641cb946708675423";  // N.B. Key must be removed in version given to students.
+	static String fileEx1 = "/root/Ex3token1"; // N.B. Key must be removed in version given to students.
 	static Cipher decAEScipher;
 	static Cipher encAEScipher;
 
 	public static void main(String[] args) throws Exception {
-
-		// Initiate the AES cipher objects for the long term key.
-		Key aesKey = new SecretKeySpec(hexStringToByteArray(hexKey), "AES");
-		decAEScipher = Cipher.getInstance("AES");
-		decAEScipher.init(Cipher.DECRYPT_MODE, aesKey);
-		encAEScipher = Cipher.getInstance("AES");
-		encAEScipher.init(Cipher.ENCRYPT_MODE, aesKey);
-
-		// Listen for connections for the client
-		ServerSocket listening = new ServerSocket(portNo);
-		while (true) {
-			// For each connection spin off a new protocol instance.
-			Socket connection = listening.accept();
-			Thread instance = new Thread(new ProtocolInstance(connection));
-			instance.start();
-		}
+		new Protocol3().run();
 	}
 
 	private static class ProtocolInstance implements Runnable {
 		Socket myConnection;
+
 		public ProtocolInstance(Socket myConnection) {
 			this.myConnection = myConnection;
 		}
@@ -57,7 +42,7 @@ public class Protocol3 {
 				inStream = myConnection.getInputStream();
 
 				//
-				//Message1: C -> S: {SessionKey}_Kcs
+				// Message1: C -> S: {SessionKey}_Kcs
 				//
 				byte[] message1 = new byte[32];
 				inStream.read(message1);
@@ -69,7 +54,7 @@ public class Protocol3 {
 				encAESsessionCipher.init(Cipher.ENCRYPT_MODE, aesKey);
 
 				//
-				//Message2: S-> C: N_S, {N_S}_Kcs, {Sec}_{SessionKey}
+				// Message2: S-> C: N_S, {N_S}_Kcs, {Sec}_{SessionKey}
 				//
 				SecureRandom gen = new SecureRandom();
 				byte[] nonce = new byte[16];
@@ -77,20 +62,19 @@ public class Protocol3 {
 				byte[] message2 = new byte[112];
 				System.arraycopy(nonce, 0, message2, 0, 16);
 				System.arraycopy(encAEScipher.doFinal(nonce), 0, message2, 16, 32);
-				byte[] secret = ("Well Done. Submit this value: "+secretValue()).getBytes();
+				byte[] secret = ("Well Done. Submit this value: " + secretValue()).getBytes();
 				System.arraycopy(encAESsessionCipher.doFinal(secret), 0, message2, 48, 64);
 				outStream.write(message2);
 				outStream.flush();
 				myConnection.close();
 			} catch (Exception e) {
-				System.out.println("Exception  "+e);
+				System.out.println("Exception  " + e);
 				return;
 			}
 		}
 	}
 
-
-	//N.B. This method must be removed before the file is given to students.
+	// N.B. This method must be removed before the file is given to students.
 	private static String secretValue() {
 		return "<%= @token %>";
 	}
@@ -99,8 +83,7 @@ public class Protocol3 {
 		int len = s.length();
 		byte[] data = new byte[len / 2];
 		for (int i = 0; i < len; i += 2) {
-			data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-					+ Character.digit(s.charAt(i+1), 16));
+			data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
 		}
 		return data;
 	}
@@ -111,13 +94,34 @@ public class Protocol3 {
 			int halfbyte = (data[i] >>> 4) & 0x0F;
 			int two_halfs = 0;
 			do {
-				if ((0 <= halfbyte) && (halfbyte <= 9))
-					buf.append((char) ('0' + halfbyte));
-				else
-					buf.append((char) ('a' + (halfbyte - 10)));
+				if ((0 <= halfbyte) && (halfbyte <= 9)) buf.append((char) ('0' + halfbyte));
+				else buf.append((char) ('a' + (halfbyte - 10)));
 				halfbyte = data[i] & 0x0F;
-			} while(two_halfs++ < 1);
+			} while (two_halfs++ < 1);
 		}
 		return buf.toString();
+	}
+
+	@Override
+	public void run() {
+		try {
+			// Initiate the AES cipher objects for the long term key.
+			Key aesKey = new SecretKeySpec(hexStringToByteArray(hexKey), "AES");
+			decAEScipher = Cipher.getInstance("AES");
+			decAEScipher.init(Cipher.DECRYPT_MODE, aesKey);
+			encAEScipher = Cipher.getInstance("AES");
+			encAEScipher.init(Cipher.ENCRYPT_MODE, aesKey);
+
+			// Listen for connections for the client
+			ServerSocket listening = new ServerSocket(portNo);
+			while (true) {
+				// For each connection spin off a new protocol instance.
+				Socket connection = listening.accept();
+				Thread instance = new Thread(new ProtocolInstance(connection));
+				instance.start();
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 }

@@ -8,6 +8,6 @@
   "issues_url": null,
   "project_page": null,
   "dependencies": [
-    {"version_requirement":">= 5.2.0","name":"garethr-java"}
+    {"version_requirement":">= 5.2.0","name":"garethr-docker"}
   ]
 }
