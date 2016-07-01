@@ -85,15 +85,17 @@ class protocols {
 				recurse => true,
 				ensure => directory,
 			}
+
       # Creates every protocol start
-      exec { "start_server${protocol}":
-        command => "echo 'java ${protocol} &' >> startprotocol",
+      exec { "${protocol}_start":
+        command => "echo 'java RunProtocol ${protocol}.class &' >> startprotocol",
         path => '/usr/bin/:/bin',
         cwd => '/etc/init.d',
         require => File["startprotocol"],
       }
 		}
 	}
+
   # Starts every protocols on start of VM
   file {"startprotocol":
   	path => "/etc/init.d/startprotocol",
@@ -120,7 +122,7 @@ class protocols {
 		groups   => "charlie",
 		password => '$1$AS8jt.x2$er9sp1Bi8axWTEQnVK4Gg/',
 		password_max_age => '99999',
-      		password_min_age => '0',
+    password_min_age => '0',
 		shell    => '/bin/bash',
 		gid      => '001',
 		uid	 => '505',
