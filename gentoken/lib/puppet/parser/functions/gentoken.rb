@@ -6,12 +6,13 @@ module Puppet::Parser::Functions
     vmid = lookupvar('vmid')
 
     # Combine attributes together
-    data = exercise + "-" + vmid
+    data = exercise + vmid
 
     # Use cipher to generate token bytes
     cipher = OpenSSL::Cipher::AES.new(128, :ECB)
     cipher.encrypt
-    cipher.key = aeskey
+    cipher.key = aeskey.unpack('a2'*32).map{|x| x.hex}.pack('c'*32) # Convert key from hex to binary
+    cipher.padding = 0
     encrypted = cipher.update(data) + cipher.final
 
     # Convert bytes into hex

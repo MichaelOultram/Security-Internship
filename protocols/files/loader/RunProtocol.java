@@ -1,7 +1,11 @@
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.net.ServerSocket;
+import java.net.Socket;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -11,7 +15,7 @@ public class RunProtocol extends ClassLoader {
 	public static void main(String[] args) throws Exception {
 		RunProtocol mycl = new RunProtocol();
 
-		File file = new File(args[0]);
+		File file = new File(args[1]);
 		InputStream in = new FileInputStream(file);
 		ByteArrayOutputStream bout = new ByteArrayOutputStream();
 		int len = 0;
@@ -28,8 +32,22 @@ public class RunProtocol extends ClassLoader {
 
 		byte[] myClassBytes = decAEScipher.doFinal(myClassBytesEnc);
 
-		Class myclass = mycl.defineClass(null, myClassBytes, 0, myClassBytes.length);
-		((Runnable) myclass.newInstance()).run();
+		Class<?> myClass = mycl.defineClass(null, myClassBytes, 0, myClassBytes.length);
+		Class<?>[] cArg = new Class[1];
+		cArg[0] = Socket.class;
+		Constructor<?> protocol = myClass.getDeclaredConstructor(cArg);
+
+		try (ServerSocket listening = new ServerSocket(Integer.parseInt(args[0]))) {
+			while (true) {
+				try {
+					new Thread((Runnable) protocol.newInstance(listening.accept())).start();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	private static byte[] hexStringToByteArray(String s) {
