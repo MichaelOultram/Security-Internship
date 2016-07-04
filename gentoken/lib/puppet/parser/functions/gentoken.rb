@@ -8,6 +8,12 @@ module Puppet::Parser::Functions
     # Combine attributes together
     data = exercise + vmid
 
+    if data.size < 16 then
+      warning(exercise + " token is too short")
+    elsif data.size > 16
+      warning(exercise + " token is too long")
+    end
+
     # Use cipher to generate token bytes
     cipher = OpenSSL::Cipher::AES.new(128, :ECB)
     cipher.encrypt

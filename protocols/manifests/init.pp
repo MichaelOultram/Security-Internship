@@ -25,11 +25,11 @@ class protocols {
 		require => File['/root/EncryptClass.java'],
 	}
 	exec { "remove_encrypt":
-	command => "rm Encrypt*",
-	path => '/usr/bin/:/bin',
-	cwd => '/root/',
-	require => install_protocol[$protocolsArray],
-}
+		command => "rm Encrypt*",
+		path => '/usr/bin/:/bin',
+		cwd => '/root/',
+		require => install_protocol[$protocolsArray],
+	}
 
 	# Setup Protocol Loader
 	file { "RunProtocol.java":

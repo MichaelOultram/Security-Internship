@@ -37,7 +37,7 @@ define protocols::install_protocol($detail_str = $title) {
       command => "java EncryptClass ${protocol}.class",
       path => '/usr/bin/:/bin',
       cwd => '/root/',
-      require => File['/root/EncryptClass.java']
+      require => Exec['compile_class']
   }
 
     # Copy version without token
