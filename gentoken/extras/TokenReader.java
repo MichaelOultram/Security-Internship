@@ -6,7 +6,7 @@ public class TokenReader {
 	private static String strKey = "3eafda76cb8b015641cb946708675423";
 
 	public static void main(String[] args) throws Exception {
-		String strCipher = "2823071698aaa309854c4b65a78d5725";
+		String strCipher = "8475e3cc86b7aad76a1d7f4f3abb220e";
 		System.out.println(decrypt(strCipher));
 
 		// String strPlain = "ex31080027cea7a4";
