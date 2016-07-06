@@ -3,10 +3,15 @@ module Puppet::Parser::Functions
     # Attributes to create token with
     aeskey = "3eafda76cb8b015641cb946708675423" # Replace me!
     exercise = args[0]
+    buffersize = args[1]
     vmid = lookupvar('vmid')
 
     # Combine attributes together
-    data = exercise + vmid
+    if buffersize != "" then
+      data = exercise + "-" + buffersize + "-" + vmid[4..11]
+    elsif
+      data = exercise + vmid
+    end
 
     if data.size < 16 then
       warning(exercise + " token is too short")

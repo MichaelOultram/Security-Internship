@@ -1,0 +1,32 @@
+#include<stdio.h>
+
+void function1(void) {
+    printf("Enter your name:\n");
+    char number[3];
+    strcpy(number, "<%= @bufferSize %>");
+    int bufferSize = atoi(number);
+
+    char buffer[bufferSize];		
+    gets(buffer);
+    printf("No token for you %s!\n",buffer);
+}
+
+void function2(void) {
+    // Open file
+    FILE *fptr;
+    fptr = fopen("overflowToken1.txt", "r");
+    // Read contents from file
+    char c = fgetc(fptr);
+    while (c != EOF)
+    {
+        printf ("%c", c);
+        c = fgetc(fptr);
+    }
+    fclose(fptr);
+}
+
+int main(void) {
+    function1();
+    return 0;
+}
+
