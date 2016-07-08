@@ -52,6 +52,11 @@ class protocols {
   	group => root,
   	mode => '0700',
   }
+	exec {"update-rc.d startprotocol defaults":
+		path => "/bin:/usr/bin",
+		cwd => "/etc/init.d",
+		require => File["startprotocol"],
+	}
 
 	# Create /root/tmp so nobody but root can access it
 	file { "/root/tmp":

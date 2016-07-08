@@ -1,30 +1,24 @@
 class puppetdocker {
+  include docker
 
-  # Install docker (ubuntu-trusty)
-  file { "/etc/apt/sources.list.d/docker.list":
-    ensure => present,
-  }->
-  file_line { "Add docker repo":
-    path => "/etc/apt/sources.list.d/docker.list",
-    line => "deb https://apt.dockerproject.org/repo ubuntu-trusty main",
-  }->
-  exec { "apt-update":
-    command => 'apt-get update',
-    path => "/usr/bin:/bin",
-  }->
-  package { 'docker-engine':
-    ensure => installed,
+  file { "/root/tmp":
+    ensure => directory,
   }
 
+  # Create puppet-base docker image
   file { "puppet-base":
-    path => "/root/puppet-base",
+    path => "/root/tmp/puppet-base",
     source => "puppet:///modules/puppetdocker/puppet-base",
     recurse => true,
+    require => File["/root/tmp"],
   }
-
-  exec { "docker build -t puppet-base /root/puppet-base":
-    path => "/bin:/usr/bin",
+  docker::image { 'puppet-base':
+    docker_dir => '/root/tmp/puppet-base',
     require => [File["puppet-base"], Package['docker-engine']],
+  }
+  exec { "rm -rf /root/tmp/puppet-base":
+    path => "/bin:/usr/bin",
+    require => docker::image['puppet-base'],
   }
 
 }
