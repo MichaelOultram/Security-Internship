@@ -1,3 +1,0 @@
-mod "nginx",
-       :git => "https://github.com/jfryman/puppet-nginx",
-       :ref => '0.1.0'
