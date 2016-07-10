@@ -20,5 +20,4 @@ class puppetdocker {
     path => "/bin:/usr/bin",
     require => docker::image['puppet-base'],
   }
-
 }
