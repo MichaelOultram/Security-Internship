@@ -11,13 +11,12 @@ define puppetdocker::network($domain, $cidr, $isolated = true) {
     # Isolate the network from the VM (ip route del 172.18.0.254)
     exec { "ip route del ${cidr}":
       path    => "/usr/bin:/bin",
-      require => docker_network[$name],
+      require => Docker_network[$name],
       unless => "test -n `ip route | grep ${cidr}`",
     }
 
     # Create a gateway container
-    /*puppetdocker::container { "gateway":
-      name => "gateway",
+    /*puppetdocker::container { "gateway.${domain}":
       network => $name,
       ip_address => $container_gateway,
       require => [docker_network[$name], file_line['Google DNS']],
@@ -51,9 +50,9 @@ define puppetdocker::network($domain, $cidr, $isolated = true) {
     require => Package['bind9'],
   }
   file_line { 'Google DNS':
-    line    => "forwarders { 8.8.8.8; 8.8.4.4; };",
+    line    => "  forwarders { 8.8.8.8; 8.8.4.4; };",
     path    => "/etc/bind/named.conf.options",
-    after   => "options {",
+    after   => "options \{",
     notify  => Service['bind9'],
     require => Package['bind9'],
   }

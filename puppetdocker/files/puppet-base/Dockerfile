@@ -1,3 +1,4 @@
+
 # Using http://phusion.github.io/baseimage-docker/
 FROM phusion/baseimage
 
@@ -10,7 +11,7 @@ COPY ./start.sh /root/start.sh
 
 # Install puppet agent
 RUN apt-get update && \
-    apt-get install -y wget && \
+    apt-get install -y wget iproute2 && \
     cd /tmp && \
     wget -q https://apt.puppetlabs.com/puppetlabs-release-pc1-wheezy.deb && \
     dpkg -i /tmp/puppetlabs-release-pc1-wheezy.deb && \

@@ -1,5 +1,7 @@
 class puppetdocker {
-  include docker
+  class { "docker":
+    iptables => false,
+  }
 
   file { "/root/tmp":
     ensure => directory,
@@ -14,10 +16,10 @@ class puppetdocker {
   }
   docker::image { 'puppet-base':
     docker_dir => '/root/tmp/puppet-base',
-    require => [File["puppet-base"], Package['docker-engine']],
+    require => File["puppet-base"],
   }
   exec { "rm -rf /root/tmp/puppet-base":
     path => "/bin:/usr/bin",
-    require => docker::image['puppet-base'],
+    require => Docker::Image['puppet-base'],
   }
 }
