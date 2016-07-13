@@ -13,13 +13,11 @@ class puppetdocker {
     source => "puppet:///modules/puppetdocker/puppet-base",
     recurse => true,
     require => File["/root/tmp"],
-  }
+  }->
   docker::image { 'puppet-base':
     docker_dir => '/root/tmp/puppet-base',
-    require => File["puppet-base"],
-  }
+  }->
   exec { "rm -rf /root/tmp/puppet-base":
-    path => "/bin:/usr/bin",
-    require => Docker::Image['puppet-base'],
+    provider => "shell",
   }
 }

@@ -7,6 +7,7 @@ ENV TERM dumb
 ENV PATH /opt/puppetlabs/bin:$PATH
 
 # Fix gateway
+COPY ./build.sh /root/build.sh
 COPY ./start.sh /root/start.sh
 
 # Install puppet agent
@@ -20,4 +21,4 @@ RUN apt-get update && \
     rm -r /tmp/*
 
 # Container start command
-CMD /root/start.sh && /sbin/my_init
+CMD 'bash -c "/root/build.sh"'

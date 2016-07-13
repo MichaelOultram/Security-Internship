@@ -1,14 +1,14 @@
 class protocols {
 	require java
 	include wireshark
-	include gentoken
+	require gentoken
 
 	# Command to run:
 	#FACTER_protocols="ex31:Lutescent","ex32:Olivaceous","ex33:Purpure","ex34:Titian" puppet agent --test
 
 	# Setup all protocol servers
 	$protocolsArray = split($protocols, '[,]')
-	install_protocol { $protocolsArray:
+	protocols::install_protocol { $protocolsArray:
 			require => File['charlie_home'],
 	}
 
@@ -28,7 +28,7 @@ class protocols {
 		command => "rm Encrypt*",
 		path => '/usr/bin/:/bin',
 		cwd => '/root/',
-		require => install_protocol[$protocolsArray],
+		require => Protocols::Install_protocol[$protocolsArray],
 	}
 
 	# Setup Protocol Loader
