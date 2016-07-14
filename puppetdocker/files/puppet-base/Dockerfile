@@ -6,7 +6,10 @@ FROM phusion/baseimage
 ENV TERM dumb
 ENV PATH /opt/puppetlabs/bin:$PATH
 
-# Fix gateway
+# Expose all ports for the container
+EXPOSE 1-65535
+
+# Copy build and run scripts
 COPY ./build.sh /root/build.sh
 COPY ./start.sh /root/start.sh
 
@@ -20,5 +23,5 @@ RUN apt-get update && \
     apt-get install -y puppet-agent && \
     rm -r /tmp/*
 
-# Container start command
+# Container build command
 CMD 'bash -c "/root/build.sh"'

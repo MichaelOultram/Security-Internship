@@ -12,10 +12,8 @@ define puppetdocker::container($network = "bridge", $ip_address = "") {
     name     => "build-${name}",
     hostname => $name,
     command  => "bash -c '/root/build.sh'",
+    restart  => "no",
     extra_parameters => ["--cap-add=NET_ADMIN"], # May require priviledged for some puppet modules?
-    restart_service => false,
-    remove_container_on_start => false,
-    remove_container_on_stop  => false,
   }-> # Wait for the build to start
   exec { 'wait-for-build-start':
     require => Docker::Run["build-${name}"],
@@ -28,11 +26,12 @@ define puppetdocker::container($network = "bridge", $ip_address = "") {
   }-> # Create an image from the build container and change the startup command
   exec { "${name} image":
     provider => 'shell',
-    command => "docker commit --change 'CMD /root/start.sh && /sbin/my_init' build-${name} ${name}"
+    command => "docker commit --change 'CMD /root/start.sh && /sbin/my_init' build-${name} ${name}",
   }-> # Remove the build container
   exec { "remove build-${name}":
     command => "docker rm build-${name}",
     provider => 'shell',
+    before => Docker::Run[$name],
   }
 
   # Start a container of the newly build image
@@ -41,10 +40,8 @@ define puppetdocker::container($network = "bridge", $ip_address = "") {
       image    => $name,
       name     => $name,
       hostname => $name,
-      dns      => $dns,
       net      => "bridge",
-      extra_parameters => ["--cap-add=NET_ADMIN"],
-      require => Exec["${name} image"],
+      extra_parameters => ["--cap-add=NET_ADMIN", "--restart=always"],
     }
   } else { # Only containers on a separate network can have a user chosen ip
     docker::run { $name:
@@ -53,8 +50,7 @@ define puppetdocker::container($network = "bridge", $ip_address = "") {
       hostname => $name,
       dns      => $dns,
       net      => $network,
-      extra_parameters => ["--cap-add=NET_ADMIN", "--ip=${ip_address}"],
-      require => Exec["${name} image"],
+      extra_parameters => ["--cap-add=NET_ADMIN", "--ip=${ip_address}", "--restart=always"],
     }
   }
 }

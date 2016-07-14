@@ -20,4 +20,6 @@ class puppetdocker {
   exec { "rm -rf /root/tmp/puppet-base":
     provider => "shell",
   }
+
+  # Ensure iptables are saved by using iptables-persistent package and iptables-save >/etc/iptables/rules.v4
 }

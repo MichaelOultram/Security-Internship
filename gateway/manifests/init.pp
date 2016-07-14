@@ -1,10 +1,11 @@
-class gateway ($port_forwarding = []) {
+class gateway {
   include firewall
 
-  firewall { 'Allow clients to access the internet':
+  # Allow containers inside the network to access the outside world
+  firewall { 'nat eth0':
     chain  => 'POSTROUTING',
     table  => 'nat',
-    output => 'eth0',
+    output => 'eth0', # eth0 should be the docker0 (public) network
     jump   => 'MASQUERADE',
   }
 
