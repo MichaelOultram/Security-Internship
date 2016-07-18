@@ -29,6 +29,7 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
     name     => "build-${name}",
     hostname => $name,
     command  => "bash -c '/root/build.sh'",
+    dns      => '172.17.0.1', # The local VM
     restart  => "no",
     extra_parameters => ["--cap-add=NET_ADMIN"], # May require priviledged for some puppet modules?
   }-> # Wait for the build to start
@@ -60,7 +61,7 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
       name     => $name,
       hostname => $name,
       net      => "bridge",
-      dns      => '172.17.0.1',
+      dns      => '172.17.0.1', # The local VM
       extra_parameters => ["--cap-add=NET_ADMIN", "--restart=always"],
     }
     exec { "add ${name} domain to hosts file":
@@ -78,7 +79,7 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
       name     => $name,
       hostname => $name,
       net      => "none",
-      dns      => '172.17.0.1',
+      dns      => '172.17.0.1', # The local VM
       extra_parameters => ["--cap-add=NET_ADMIN", "--restart=always"],
     }
   } else {
@@ -96,7 +97,7 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
       name     => $name,
       hostname => $name,
       net      => $head_net,
-      dns      => '172.17.0.1',
+      dns      => '172.17.0.1', # The local VM
       extra_parameters => ["--cap-add=NET_ADMIN", "--restart=always", "--ip=${head_ip}"],
       require => Puppetdocker::Network[$head_net],
     }

@@ -37,8 +37,8 @@ class puppetdocker {
     path    => "/etc/resolv-public.conf",
     notify  => Service['dnsmasq'],
   }
-  file_line { 'dnsmasq use public':
-    line    => "resolv-file=/etc/resolv-public.conf",
+  file { 'dnsmasq configuration':
+    source => "puppet:///modules/puppetdocker/dnsmasq.conf",
     path    => "/etc/dnsmasq.conf",
     notify  => Service['dnsmasq'],
     require => Package['dnsmasq'],
@@ -46,6 +46,6 @@ class puppetdocker {
   file { 'vm use local dns':
     content => "nameserver 127.0.0.1",
     path    => "/etc/resolv.conf",
-    require => [File['public dns servers'], File_line['dnsmasq use public']],
+    require => [File['public dns servers'], File['dnsmasq configuration']],
   }
 }

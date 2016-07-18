@@ -14,9 +14,6 @@ new_ip=${seg[0]}.${seg[1]}.${seg[2]}.1
 ip route del default
 ip route add default via $new_ip
 
-# Update DNS servers
-echo "nameserver ${new_ip}" > /etc/resolv.conf
-
 # Execute all startup files
 for SCRIPT in /root/startup/*
 do

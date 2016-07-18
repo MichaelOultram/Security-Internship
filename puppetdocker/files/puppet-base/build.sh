@@ -1,5 +1,5 @@
 # TODO: Remove this
-echo "10.10.10.2 puppet.local.vm" >> /etc/hosts
+#echo "10.10.10.2 puppet.local.vm" >> /etc/hosts
 
 # Configure container via puppet
 puppet agent --server puppet.local.vm --waitforcert 5 --test
