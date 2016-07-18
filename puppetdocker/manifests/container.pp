@@ -11,12 +11,12 @@
 # connected to mapped to the ip address the container should have inside the
 # network (e.g. {"isonet" => "172.18.0.1"})
 #
-define puppetdocker::container($public_network = false, $private_networks = {}) {
+define puppetdocker::container($public_network = false, $private_networks = []) {
   include stdlib
 
   # Validate argument types
   validate_bool($public_network)
-  validate_hash($private_networks)
+  validate_array($private_networks)
 
   # Check to see if the image has already been built (doesn't currently work)
   exec { "${name} container built?":
@@ -60,6 +60,7 @@ define puppetdocker::container($public_network = false, $private_networks = {}) 
       name     => $name,
       hostname => $name,
       net      => "bridge",
+      dns      => '172.17.0.1',
       extra_parameters => ["--cap-add=NET_ADMIN", "--restart=always"],
     }
     exec { "add ${name} domain to hosts file":
@@ -71,20 +72,21 @@ define puppetdocker::container($public_network = false, $private_networks = {}) 
     }
   } elsif size($private_networks) == 0 {
     # No networks to connect to
-    $private_networks_tail = {}
+    $private_networks_tail = []
     docker::run { $name:
       image    => $name,
       name     => $name,
       hostname => $name,
       net      => "none",
+      dns      => '172.17.0.1',
       extra_parameters => ["--cap-add=NET_ADMIN", "--restart=always"],
     }
   } else {
     # Get the first network and connect to that
-    $private_networks_tail = delete_at($private_networks, 0)
     $private_networks_head = $private_networks[0]
-    $head_net = $network_head.keys[0]
-    $head_ip = $network_head.value[$head_net]
+    $private_networks_tail = delete_at($private_networks, 0)
+    $head_net = split($private_networks_head, " ")[0]
+    $head_ip = split($private_networks_head, " ")[1]
 
     validate_string($head_net)
     validate_ip_address($head_ip)
@@ -94,7 +96,9 @@ define puppetdocker::container($public_network = false, $private_networks = {}) 
       name     => $name,
       hostname => $name,
       net      => $head_net,
+      dns      => '172.17.0.1',
       extra_parameters => ["--cap-add=NET_ADMIN", "--restart=always", "--ip=${head_ip}"],
+      require => Puppetdocker::Network[$head_net],
     }
   }
 
@@ -104,8 +108,7 @@ define puppetdocker::container($public_network = false, $private_networks = {}) 
     command => "while [ $(docker ps --filter status=running --filter name=${name} -q | wc -l) != '1' ]; do sleep 1; done",
   }
 
-  $private_networks_joined = join_keys_to_values($private_networks, " ")
-  connect_to_network { $private_networks_joined:
+  connect_to_network { $private_networks_tail:
     container => $name,
     require => Exec["wait-for-${name}-start"],
   }
@@ -120,5 +123,6 @@ define connect_to_network ($container) {
   exec { "docker network connect bridge ${name}":
     command => "docker network connect --ip ${ip} ${net} ${container}",
     provider => "shell",
+    require => Puppetdocker::Network[$net],
   }
 }

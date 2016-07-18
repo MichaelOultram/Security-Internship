@@ -36,11 +36,11 @@ define puppetdocker::network($domain, $cidr) {
   }
 
   # Create a gateway container
-  puppetdocker::container { $domain:
+  /*puppetdocker::container { $domain:
     public_network => true,
-    private_networks => {$name => $container_gateway},
+    private_networks => ["${name} ${container_gateway}"],
     require => Docker_network[$name],
-  }
+  }*/
 
 
 }

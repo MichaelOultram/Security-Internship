@@ -8,6 +8,7 @@ puppet agent --server puppet.local.vm --waitforcert 5 --test
 apt-get autoremove -y puppet-agent
 rm -rf /opt/puppetlabs
 rm -rf /etc/puppetlabs
+rm /etc/init.d/puppet
 
 # Remove the first value (/opt/puppetlabs/bin) from the path
 paths=(${PATH//:/ })

@@ -12,10 +12,11 @@ EXPOSE 1-65535
 # Copy build and run scripts
 COPY ./build.sh /root/build.sh
 COPY ./start.sh /root/start.sh
+COPY ./startup /root/startup
 
 # Install puppet agent
 RUN apt-get update && \
-    apt-get install -y wget iproute2 && \
+    apt-get install -y wget iproute2 inetutils-ping iptables && \
     cd /tmp && \
     wget -q https://apt.puppetlabs.com/puppetlabs-release-pc1-wheezy.deb && \
     dpkg -i /tmp/puppetlabs-release-pc1-wheezy.deb && \
