@@ -102,7 +102,7 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
   exec { "wait-for-${name}-start":
     require => Docker::Run[$name],
     provider => 'shell',
-    command => "while [ $(docker ps --filter status=running --filter name=${name} -q | wc -l) != '1' ]; do sleep 1; done",
+    command => "while [ $(docker ps --filter status=running --filter name=^/${name}$ -q | wc -l) != '1' ]; do sleep 1; done",
   }
 
   connect_to_network { $private_networks_tail:
