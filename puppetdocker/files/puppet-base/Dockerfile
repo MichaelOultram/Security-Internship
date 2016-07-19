@@ -7,7 +7,7 @@ ENV TERM dumb
 ENV PATH /opt/puppetlabs/bin:$PATH
 
 # Expose all ports for the container
-EXPOSE 1-65535
+#EXPOSE 1-65535
 
 # Copy build and run scripts
 COPY ./build.sh /root/build.sh
