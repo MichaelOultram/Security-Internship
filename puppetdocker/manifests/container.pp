@@ -32,15 +32,11 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
     dns      => '172.17.0.1', # The local VM
     restart  => "no",
     extra_parameters => ["--cap-add=NET_ADMIN"], # May require priviledged for some puppet modules?
-  }-> # Wait for the build to start
-  exec { "wait-for-build-${name}-start":
+  }-> # Wait for the build
+  exec { "wait-for-build-${name}":
     require => Docker::Run["build-${name}"],
     provider => 'shell',
-    command => "while [ $(docker ps --filter status=running --filter name=build-${name} -q | wc -l) != '1' ]; do sleep 1; done",
-  }-> # Wait for the build to end
-  exec { "wait-for-build-${name}-end":
-    provider => 'shell',
-    command => "while [ $(docker ps --filter status=running --filter name=build-${name} -q | wc -l) != '0' ]; do sleep 1; done",
+    command => "docker wait build-${name}",
   }-> # Create an image from the build container and change the startup command
   exec { "${name} image":
     provider => 'shell',
