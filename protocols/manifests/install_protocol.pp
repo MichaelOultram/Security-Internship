@@ -1,4 +1,6 @@
 define protocols::install_protocol($detail_str = $title) {
+  include stdlib
+
   $detail_arr = split($detail_str, ':')
   $exercise = $detail_arr[0]
   $protocol = join([$detail_arr[1], "Protocol"])
@@ -52,11 +54,18 @@ define protocols::install_protocol($detail_str = $title) {
     }
 
     # Creates every protocol start
-    exec { "${protocol}_start":
-      command => "echo 'java RunProtocol ${port} ${protocol}.class &' >> startprotocol",
-      path => '/usr/bin/:/bin',
-      cwd => '/etc/init.d',
-      require => File["startprotocol"],
+    if $::in_container {
+      file_line { "${protocol}_start":
+        line => "java RunProtocol ${port} ${protocol}.class &",
+        path => '/root/startup/startprotocol',
+        require => File["startprotocol"],
+      }
+    } else {
+      file_line { "${protocol}_start":
+        line => "java RunProtocol ${port} ${protocol}.class &",
+        path => '/etc/init.d/startprotocol',
+        require => File["startprotocol"],
+      }
     }
   }
 }

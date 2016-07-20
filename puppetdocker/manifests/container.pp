@@ -31,7 +31,7 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
     command  => "bash -c '/root/build.sh'",
     dns      => '172.17.0.1', # The local VM
     restart  => "no",
-    extra_parameters => ["--cap-add=NET_ADMIN"], # May require priviledged for some puppet modules?
+    extra_parameters => ["--privileged"], # Privileged so that vmid works
   }-> # Wait for the build
   exec { "wait-for-build-${name}":
     require => Docker::Run["build-${name}"],

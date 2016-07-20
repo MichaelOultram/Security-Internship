@@ -14,9 +14,10 @@ module Puppet::Parser::Functions
     end
 
     if data.size < 16 then
-      warning(exercise + " token is too short")
+      fail(data + " token is too short")
     elsif data.size > 16
-      warning(exercise + " token is too long")
+      #fail(data + " token is too long")
+      data = data[0..15]
     end
 
     # Use cipher to generate token bytes

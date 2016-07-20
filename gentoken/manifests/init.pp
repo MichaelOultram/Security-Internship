@@ -1,6 +1,6 @@
 # Probably not needed
 class gentoken {
-  $packages = ["openssl", "ruby"]
+  $packages = ["dmidecode"]
   package { $packages:
     ensure => "installed",
   }
