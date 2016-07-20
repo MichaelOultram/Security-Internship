@@ -10,7 +10,7 @@ define protocols::install_protocol($detail_str = $title) {
     $port = 0
   }
 
-  $token = gentoken("${exercise}","")
+  $token = gentoken($exercise)
 
   if("${protocol}" != '') {
     # Copy version with token

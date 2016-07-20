@@ -7,8 +7,8 @@ class reverse {
 	# -------------------REVERSE ENGINEERING WITH C++----------------------#
 	# ---------------------------------------------------------------------#
 
-	$password = genString() # Set the random string in here! with ruby 
-	$tokenReverse = gentoken($reverse,"") # Set as a facter FACTER_reverse="ex51" puppet agent --test
+	$password = genString() # Set the random string in here! with ruby
+	$tokenReverse = gentoken($reverse) # Set as a facter FACTER_reverse="ex51" puppet agent --test
 
 	if("${reverse}" != '') {
 		# Compile and move code to dan's folder and mistery folder

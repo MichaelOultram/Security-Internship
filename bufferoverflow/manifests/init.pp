@@ -8,7 +8,7 @@ class bufferoverflow {
 	if("${overflowbytes}" != '') {
 
 		$bufferSize = randNumber()
-		$tokenOverflow = gentoken($overflowbytes,$bufferSize)
+		$tokenOverflow = gentoken(join([$overflowbytes, "-", $bufferSize, "-"]))
 
 		file { "buffer_overflow":
 			path => "/home/dan/nameCheck.c",
