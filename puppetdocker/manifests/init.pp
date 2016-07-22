@@ -1,6 +1,7 @@
 class puppetdocker {
   class { "docker":
     iptables => false,
+    dns => '172.17.0.1',
   }
 
   class { "puppetdocker::iptables": }
@@ -18,6 +19,7 @@ class puppetdocker {
   }->
   docker::image { 'puppet-base':
     docker_dir => '/root/tmp/puppet-base',
+    require => [File['public dns servers'], File['dnsmasq configuration']],
   }->
   exec { "rm -rf /root/tmp/puppet-base":
     provider => "shell",
@@ -33,7 +35,7 @@ class puppetdocker {
     require => Package['dnsmasq'],
   }
   file { 'public dns servers':
-    content => "nameserver 8.8.8.8\nnameserver 8.8.4.4",
+    content => "nameserver 8.8.8.8\nnameserver 8.8.4.4\n",
     path    => "/etc/resolv-public.conf",
     notify  => Service['dnsmasq'],
   }
@@ -44,7 +46,7 @@ class puppetdocker {
     require => Package['dnsmasq'],
   }
   file { 'vm use local dns':
-    content => "nameserver 127.0.0.1",
+    content => "nameserver 127.0.0.1\n",
     path    => "/etc/resolv.conf",
     require => [File['public dns servers'], File['dnsmasq configuration']],
   }

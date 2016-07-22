@@ -23,6 +23,9 @@ do
 	fi
 done
 
+# Use full hostname as prompt
+echo 'PS1="\[\u@$(hostname -f):\w\]\$ "' >> /etc/bash.bashrc
+
 # Remove startup files
 rm -rf /root/startup
 

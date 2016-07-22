@@ -29,7 +29,6 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
     name     => "build-${name}",
     hostname => $name,
     command  => "bash -c '/root/build.sh'",
-    dns      => '172.17.0.1', # The local VM
     restart  => "no",
     extra_parameters => ["--privileged"], # Privileged so that vmid works
   }-> # Wait for the build
@@ -57,7 +56,6 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
       name     => $name,
       hostname => $name,
       net      => "bridge",
-      dns      => '172.17.0.1', # The local VM
       extra_parameters => ["--cap-add=NET_ADMIN", "--restart=always"],
     }
     exec { "add ${name} domain to hosts file":
@@ -75,7 +73,6 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
       name     => $name,
       hostname => $name,
       net      => "none",
-      dns      => '172.17.0.1', # The local VM
       extra_parameters => ["--cap-add=NET_ADMIN", "--restart=always"],
     }
   } else {
@@ -93,7 +90,6 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
       name     => $name,
       hostname => $name,
       net      => $head_net,
-      dns      => '172.17.0.1', # The local VM
       extra_parameters => ["--cap-add=NET_ADMIN", "--restart=always", "--ip=${head_ip}"],
       require => Puppetdocker::Network[$head_net],
     }
@@ -112,6 +108,7 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
 }
 
 # Connect to the rest of the networks
+# TODO: Replace this as it breaks default route & isn't recreated on VM reboot
 define connect_to_network ($container) {
   $arr = split($name, " ")
   $net = $arr[0]

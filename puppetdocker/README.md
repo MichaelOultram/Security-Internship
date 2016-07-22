@@ -5,7 +5,6 @@ This module uses docker to simulate computers on the internet. Each simulated co
 - garethr-docker puppet module
 - puppetlabs-utils puppet module
 - puppetserver should autosign certificates
-- puppetserver hostname should be `puppet.local.vm` (**TODO**: Remove this requirement)
 
 ## How to use this module
 The absolute minimum node definition that puppetdocker supports is:
@@ -109,7 +108,7 @@ Below is a rough guide to what this module does behind the scenes. Hopefully it 
 
 - A puppet-base image is built which uses the phusion/baseimage to install puppet.
 
-- Each of the `puppetdocker::container` resources creates a build container from the puppet-base image. This container primarily runs the command `puppet agent --server puppet.local.vm --waitforcert 1 --test` to configure what the container should look like.
+- Each of the `puppetdocker::container` resources creates a build container from the puppet-base image. This container primarily runs the command `puppet agent --waitforcert 1 --test` to configure what the container should look like.
 
 - An image is then made for each of the built containers with the same name as the hostname. This allows for a container to be reset to a known good state.
 
