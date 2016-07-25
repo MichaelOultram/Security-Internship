@@ -56,6 +56,7 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
       name     => $name,
       hostname => $name,
       net      => "bridge",
+      remove_container_on_start => false,
       remove_container_on_stop => false,
       extra_parameters => ["--cap-add=NET_ADMIN"],
     }
@@ -74,6 +75,7 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
       name     => $name,
       hostname => $name,
       net      => "none",
+      remove_container_on_start => false,
       remove_container_on_stop => false,
       extra_parameters => ["--cap-add=NET_ADMIN"],
     }
@@ -92,6 +94,7 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
       name     => $name,
       hostname => $name,
       net      => $head_net,
+      remove_container_on_start => false,
       remove_container_on_stop => false,
       extra_parameters => ["--cap-add=NET_ADMIN", "--ip=${head_ip}"],
       require => Puppetdocker::Network[$head_net],
@@ -111,7 +114,6 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
 }
 
 # Connect to the rest of the networks
-# TODO: Replace this as it breaks default route & isn't recreated on VM reboot
 define connect_to_network ($container) {
   $arr = split($name, " ")
   $net = $arr[0]
