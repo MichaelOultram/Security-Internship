@@ -56,7 +56,8 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
       name     => $name,
       hostname => $name,
       net      => "bridge",
-      extra_parameters => ["--cap-add=NET_ADMIN", "--restart=always"],
+      remove_container_on_stop => false,
+      extra_parameters => ["--cap-add=NET_ADMIN"],
     }
     exec { "add ${name} domain to hosts file":
       provider => "shell",
@@ -73,7 +74,8 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
       name     => $name,
       hostname => $name,
       net      => "none",
-      extra_parameters => ["--cap-add=NET_ADMIN", "--restart=always"],
+      remove_container_on_stop => false,
+      extra_parameters => ["--cap-add=NET_ADMIN"],
     }
   } else {
     # Get the first network and connect to that
@@ -90,7 +92,8 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
       name     => $name,
       hostname => $name,
       net      => $head_net,
-      extra_parameters => ["--cap-add=NET_ADMIN", "--restart=always", "--ip=${head_ip}"],
+      remove_container_on_stop => false,
+      extra_parameters => ["--cap-add=NET_ADMIN", "--ip=${head_ip}"],
       require => Puppetdocker::Network[$head_net],
     }
   }
