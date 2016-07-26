@@ -19,32 +19,37 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
   validate_array($private_networks)
 
   # Check to see if the image has already been built (doesn't currently work)
-  exec { "${name} container built?":
-    command => "/bin/true",
+  exec { "${name} container not built?":
+    command => "echo 'I ran' >> /root/buildlog",
     provider => "shell",
-    onlyif => "/bin/false",
-  }-># Create a puppet-base container with the hostname set and run /root/build.sh
+    unless => "/bin/false",
+  }
+
+  # Create a puppet-base container with the hostname set and run /root/build.sh
   docker::run { "build-${name}":
     image    => "puppet-base",
     name     => "build-${name}",
     hostname => $name,
     command  => "bash -c '/root/build.sh'",
     restart  => "no",
+    require  => Exec["${name} container not built?"],
     extra_parameters => ["--privileged"], # Privileged so that vmid works
   }-> # Wait for the build
   exec { "wait-for-build-${name}":
-    require => Docker::Run["build-${name}"],
+    require => [Exec["${name} container not built?"], Docker::Run["build-${name}"]],
     provider => 'shell',
     command => "docker wait build-${name}",
   }-> # Create an image from the build container and change the startup command
   exec { "${name} image":
     provider => 'shell',
     command => "docker commit --change 'CMD /root/start.sh && /sbin/my_init' build-${name} ${name}",
+    require => Exec["${name} container not built?"],
   }-> # Remove the build container
   exec { "remove build-${name}":
     command => "docker rm build-${name}",
     provider => 'shell',
     before => Docker::Run[$name],
+    require => Exec["${name} container not built?"],
   }
 
   # Start a container of the newly build image
@@ -110,6 +115,13 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
   connect_to_network { $private_networks_tail:
     container => $name,
     require => Exec["wait-for-${name}-start"],
+  }
+
+  # Container is restarts so that network interfaces are correct
+  exec { "restart-${name}":
+    command  => "docker stop ${name}",
+    provider => "shell",
+    require  => [Exec["wait-for-${name}-start"], Connect_to_network[$private_networks_tail]],
   }
 }
 
