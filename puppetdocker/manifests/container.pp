@@ -30,7 +30,7 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
     image    => "puppet-base",
     name     => "build-${name}",
     hostname => $name,
-    command  => "bash -c '/root/build.sh'",
+    command  => "bash -c '/build.sh'",
     restart  => "no",
     require  => Exec["${name} container not built?"],
     extra_parameters => ["--privileged"], # Privileged so that vmid works
@@ -42,7 +42,7 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
   }-> # Create an image from the build container and change the startup command
   exec { "${name} image":
     provider => 'shell',
-    command => "docker commit --change 'CMD /root/start.sh && /sbin/my_init' build-${name} ${name}",
+    command => "docker commit --change 'CMD /sbin/my_init' build-${name} ${name}",
     require => Exec["${name} container not built?"],
   }-> # Remove the build container
   exec { "remove build-${name}":
@@ -67,8 +67,9 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
     }
     exec { "add ${name} domain to hosts file":
       provider => "shell",
-      command => "echo \"$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${name}) ${name}\" >> /etc/hosts",
-      unless => "cat /etc/hosts | grep -c $(docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${name})",
+      command => "echo \"$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${name}) ${name}\" >> /etc/dnsmasq.hosts",
+      unless => "cat /etc/dnsmasq.hosts | grep -c $(docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${name})",
+      notify => Service['dnsmasq'],
       require => Exec["wait-for-${name}-start"],
       before => Connect_to_network[$private_networks_joined],
     }
@@ -114,14 +115,15 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
 
   connect_to_network { $private_networks_tail:
     container => $name,
+    notify => Exec["fixip-${name}"],
     require => Exec["wait-for-${name}-start"],
   }
 
-  # Container is restarts so that network interfaces are correct
-  exec { "restart-${name}":
-    command  => "docker stop ${name}",
+  # Need to refix ip interfaces after docker has touched them
+  exec { "fixip-${name}":
+    command  => "docker exec ${name} /etc/my_init.d/fixip.sh",
     provider => "shell",
-    require  => [Exec["wait-for-${name}-start"], Connect_to_network[$private_networks_tail]],
+    require => Exec["wait-for-${name}-start"],
   }
 }
 

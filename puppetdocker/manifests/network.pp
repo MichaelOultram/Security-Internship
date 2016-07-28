@@ -7,11 +7,10 @@
 # Classless Inter-Domain Routing. Specifies the ip range and subnet of the
 # private network. (e.g. 172.18.0.0/24)
 #
-define puppetdocker::network($domain, $cidr) {
+define puppetdocker::network($cidr) {
   include docker, stdlib
 
   # Validate argument types
-  validate_string($domain)
   validate_ip_address($cidr)
 
   # Find the gateway from $cidr
@@ -34,13 +33,5 @@ define puppetdocker::network($domain, $cidr) {
     require => Docker_network[$name],
     unless => "test -n `ip route | grep ${cidr}`",
   }
-
-  # Create a gateway container
-  /*puppetdocker::container { $domain:
-    public_network => true,
-    private_networks => ["${name} ${container_gateway}"],
-    require => Docker_network[$name],
-  }*/
-
 
 }

@@ -47,7 +47,7 @@ class protocols ($protocols = "") {
   # Starts every protocols on start of VM
 	if $::in_container{
 		file { "startprotocol":
-			path => "/root/startup/startprotocol",
+			path => "/etc/my_init.d/startprotocol",
 			content => template("protocols/startprotocol.erb"),
 			owner => root,
 			group => root,

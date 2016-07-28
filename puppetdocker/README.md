@@ -16,13 +16,12 @@ node 'local.vm' {
 This tells puppet to install docker and create the puppet-base image. It can be used to generate the base virtual machine which can then be cloned to generate virtual machines for each student (with all the containers and networks).
 
 ### Networks
-To define a network, you use the `puppetdocker::network` resource. The below example creates a network on the `172.18.0.0/24` cidr with the domain name `example.vm`. The name of the resource, `example`, becomes the name of the network and will need to be used when defining which containers go into which networks.
+To define a network, you use the `puppetdocker::network` resource. The below example creates a network on the `172.18.0.0/24` cidr. The name of the resource, `example`, becomes the name of the network and will need to be used when defining which containers go into which networks.
 
 ```puppet
 node 'local.vm' {
   puppetdocker::network {"example":
     cidr => "172.18.0.0/24",
-    domain => "example.vm",
   }
 }
 ```
@@ -60,7 +59,6 @@ node 'local.vm' {
 
   puppetdocker::network { "example":
     cidr => "172.18.0.0/24",
-    domain => "example.vm",
   }
 
   puppetdocker::container { "example.vm":

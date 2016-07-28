@@ -1,5 +1,0 @@
-#!/bin/bash
-# All executable files in this folder are run automatically when the container starts
-# Then this folder will be deleted. This script does nothing
-
-exit 0

@@ -1,10 +1,12 @@
 class phishing($ip_start = "172.18.0") {
   include puppetdocker
   include phishing::mailserver
+  /*class { "metasploit":
+    users => "alice",
+  }*/
 
   puppetdocker::network {"phishing":
     cidr => "${ip_start}.0/24",
-    domain => "phishing.vm",
   }
 
   puppetdocker::container { "phishing.vm":
@@ -72,36 +74,46 @@ class phishing::nodes ($ip_start = "172.18.0") {
 
     file { "/root/startup/mailserver.sh":
       mode => "700",
-      content => "#!/bin/bash\nservice postfix start\nservice dovecot\n",
+      content => "#!/bin/bash\nservice postfix start\nservice dovecot start\n",
+    }
+
+    file { "/var/mail":
+      ensure => directory,
+      mode => "777",
     }
 
     user { 'victim':
       ensure => present,
       shell => '/bin/false',
       password => '$6$ceaWIA/p$WGrUEwqslH/FcRq2gdv.Dro.de2D1pEyk0j8dcWonYocCHK76DStZWHi/fhFV3XO8mGfUy4eTZCWu6353mrYx0',
+    }->
+    file { "/home/victim":
+      ensure => directory,
+      owner => "victim",
+      mode => "700",
     }
   }
 
   node "comp1.phishing.vm" {
     include java
 
-    file { "/root/mail.jar":
-      source => "puppet:///modules/phishing/mail.jar",
-    }
-
     $email_server = "phishing.vm"
     $email_user = "victim"
     $email_pass = "victim"
 
-    file { "/root/LectureEx.java":
-      content => template("phishing/LectureEx.java.erb"),
+    file { "/root/mail.jar":
+      source => "puppet:///modules/phishing/mail.jar",
     }
 
-    exec { 'compile LectureEx':
-      command => 'javac -cp mail.jar LectureEx.java',
+    file { "/root/MailReader.java":
+      content => template("phishing/MailReader.java.erb"),
+    }
+
+    exec { 'compile MailReader':
+      command => 'javac -cp mail.jar MailReader.java',
       provider => "shell",
       cwd => "/root",
-      require => [File['/root/mail.jar'], File["/root/LectureEx.java"]],
+      require => [File['/root/mail.jar'], File["/root/MaileReader.java"]],
     }
 
   }

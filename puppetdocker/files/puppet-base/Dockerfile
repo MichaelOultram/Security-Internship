@@ -2,9 +2,8 @@
 FROM phusion/baseimage
 
 # Copy build and run scripts
-COPY ./build.sh /root/build.sh
-COPY ./start.sh /root/start.sh
-COPY ./startup /root/startup
+COPY ./build.sh /build.sh
+COPY ./fixip.sh /etc/my_init.d/fixip.sh
 
 # Install puppet agent
 RUN TERM=dumb && \
@@ -23,5 +22,8 @@ RUN PATH=/opt/puppetlabs/bin:$PATH && \
     puppet agent --waitforcert 1 --test && \
     find /etc/puppetlabs/puppet/ssl -name $(hostname --long).pem -delete
 
+# Change prompt to full hostname
+ENV PS1 '\[\u@$(hostname -f):\w\]\$'
+
 # Container build command
-CMD 'bash -c "/root/build.sh"'
+CMD 'bash -c "/build.sh"'
