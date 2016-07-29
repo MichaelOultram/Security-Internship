@@ -45,7 +45,7 @@ class protocols ($protocols = "") {
 	}
 
   # Starts every protocols on start of VM
-	if $::in_container{
+	if $::in_container == "true" {
 		file { "startprotocol":
 			path => "/etc/my_init.d/startprotocol",
 			content => template("protocols/startprotocol.erb"),
@@ -62,7 +62,7 @@ class protocols ($protocols = "") {
 	  	mode => '0700',
 	  }
 		exec {"update-rc.d startprotocol defaults":
-			path => "/bin:/usr/bin",
+			provider => "shell",
 			cwd => "/etc/init.d",
 			require => File["startprotocol"],
 		}

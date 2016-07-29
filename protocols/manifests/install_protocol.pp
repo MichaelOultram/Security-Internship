@@ -54,10 +54,10 @@ define protocols::install_protocol($detail_str = $title) {
     }
 
     # Creates every protocol start
-    if $::in_container {
+    if $::in_container == true{
       file_line { "${protocol}_start":
         line => "java RunProtocol ${port} ${protocol}.class &",
-        path => '/root/startup/startprotocol',
+        path => '/etc/my_init.d/startprotocol',
         require => File["startprotocol"],
       }
     } else {
