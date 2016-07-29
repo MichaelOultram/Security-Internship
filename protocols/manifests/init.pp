@@ -1,9 +1,9 @@
 class protocols ($protocols = "") {
 	require java
-	class { 'wireshark':
-	  require => File["charlie_home"],
-	}
 	require gentoken
+	class { 'wireshark':
+		require => File["charlie_home"],
+	}
 
 	# Command to run:
 	#FACTER_protocols="ex31:Lutescent","ex32:Olivaceous","ex33:Purpure","ex34:Titian" puppet agent --test
