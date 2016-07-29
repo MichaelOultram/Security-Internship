@@ -1,14 +1,14 @@
-class protocols {
+class protocols ($protocols = "") {
 	require java
 	include wireshark
-	include gentoken
+	require gentoken
 
 	# Command to run:
 	#FACTER_protocols="ex31:Lutescent","ex32:Olivaceous","ex33:Purpure","ex34:Titian" puppet agent --test
 
 	# Setup all protocol servers
 	$protocolsArray = split($protocols, '[,]')
-	install_protocol { $protocolsArray:
+	protocols::install_protocol { $protocolsArray:
 			require => File['charlie_home'],
 	}
 
@@ -28,7 +28,7 @@ class protocols {
 		command => "rm Encrypt*",
 		path => '/usr/bin/:/bin',
 		cwd => '/root/',
-		require => install_protocol[$protocolsArray],
+		require => Protocols::Install_protocol[$protocolsArray],
 	}
 
 	# Setup Protocol Loader
@@ -45,19 +45,34 @@ class protocols {
 	}
 
   # Starts every protocols on start of VM
-  file { "startprotocol":
-  	path => "/etc/init.d/startprotocol",
-  	content => template("protocols/startprotocol.erb"),
-  	owner => root,
-  	group => root,
-  	mode => '0700',
-  }
+	if $::in_container == "true"{
+		file { "startprotocol":
+			path => "/root/startup/startprotocol",
+			content => template("protocols/startprotocol.erb"),
+			owner => root,
+			group => root,
+			mode => '0700',
+		}
+	} else {
+	  file { "startprotocol":
+	  	path => "/etc/init.d/startprotocol",
+	  	content => template("protocols/startprotocol.erb"),
+	  	owner => root,
+	  	group => root,
+	  	mode => '0700',
+	  }
+		exec {"update-rc.d startprotocol defaults":
+			provider => "shell",
+			cwd => "/etc/init.d",
+			require => File["startprotocol"],
+		}
+	}
 
 	# Create /root/tmp so nobody but root can access it
 	file { "/root/tmp":
 		ensure => directory,
 		owner => "root",
-		mode => 700,
+		mode => '0700',
 	}
 
 	# Create Charlie Account

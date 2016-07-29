@@ -14,7 +14,7 @@ class ida {
 
 	exec{'unpack_tgz':
 		command => "/bin/tar -xvzf /home/dan/tools/idademo69_linux.tgz -C /home/dan/tools/ &&
-		rm /home/dan/tools/idademo69_linux.tgz",
+		rm /home/dan/tools/*.tgz",
 		creates => "/home/dan/tools/idademo69/",
 		require => Exec['retrieve_ida'],
 	}

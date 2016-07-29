@@ -7,17 +7,15 @@ module Puppet::Parser::Functions
     vmid = lookupvar('vmid')
 
     # Combine attributes together
-    if buffersize != "" then
-      data = exercise + "-" + buffersize + "-" + vmid[4..11]
-    elsif
-      data = exercise + vmid
+    data = exercise + vmid
+
+    # Check if token is too short
+    if data.size < 16 then
+      fail(data + " token is too short")
     end
 
-    if data.size < 16 then
-      warning(exercise + " token is too short")
-    elsif data.size > 16
-      warning(exercise + " token is too long")
-    end
+    # Cut token to use the first 16 characters (should just trim off some of the vmid)
+    data = data[0..15]
 
     # Use cipher to generate token bytes
     cipher = OpenSSL::Cipher::AES.new(128, :ECB)
