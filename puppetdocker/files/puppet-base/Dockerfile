@@ -2,14 +2,14 @@
 FROM phusion/baseimage
 
 # Copy build and run scripts
-COPY ./build.sh /root/build.sh
-COPY ./start.sh /root/start.sh
-COPY ./startup /root/startup
+COPY ./build.sh /build.sh
+COPY ./fixip.sh /etc/my_init.d/fixip.sh
+COPY ./fixmisc.sh /etc/my_init.d/fixmisc.sh
 
 # Install puppet agent
 RUN TERM=dumb && \
     apt-get update && \
-    apt-get install -y wget iproute2 && \
+    apt-get install -y wget iproute2 iptables-persistent && \
     cd /tmp && \
     wget -q https://apt.puppetlabs.com/puppetlabs-release-pc1-wheezy.deb && \
     dpkg -i /tmp/puppetlabs-release-pc1-wheezy.deb && \
@@ -23,5 +23,8 @@ RUN PATH=/opt/puppetlabs/bin:$PATH && \
     puppet agent --waitforcert 1 --test && \
     find /etc/puppetlabs/puppet/ssl -name $(hostname --long).pem -delete
 
+# Change prompt to full hostname
+ENV PS1 '\[\u@$(hostname -f):\w\]\$'
+
 # Container build command
-CMD 'bash -c "/root/build.sh"'
+CMD 'bash -c "/build.sh"'

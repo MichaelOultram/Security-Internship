@@ -33,21 +33,3 @@ new_ip=${seg[0]}.${seg[1]}.${seg[2]}.1
 
 # Update default route to new ip
 ip route add default via $new_ip
-
-# Execute all startup files
-for SCRIPT in /root/startup/*
-do
-	if [ -f $SCRIPT -a -x $SCRIPT ]
-  then
-		$SCRIPT
-	fi
-done
-
-# Use full hostname as prompt
-echo 'PS1="\[\u@$(hostname -f):\w\]\$ "' >> /etc/bash.bashrc
-
-# Remove startup files
-# rm -rf /root/startup
-
-# Delete self
-# rm -- "$0"

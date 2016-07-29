@@ -19,7 +19,7 @@ class puppetdocker {
   }->
   docker::image { 'puppet-base':
     docker_dir => '/root/tmp/puppet-base',
-    require => [File['public dns servers'], File['dnsmasq configuration']],
+    require => File['vm use local dns'],
   }->
   exec { "rm -rf /root/tmp/puppet-base":
     provider => "shell",
@@ -34,20 +34,25 @@ class puppetdocker {
     enable  => true,
     require => Package['dnsmasq'],
   }
-  file { 'public dns servers':
-    content => "nameserver 8.8.8.8\nnameserver 8.8.4.4\n",
-    path    => "/etc/resolv-public.conf",
-    notify  => Service['dnsmasq'],
-  }
   file { 'dnsmasq configuration':
     source => "puppet:///modules/puppetdocker/dnsmasq.conf",
     path    => "/etc/dnsmasq.conf",
-    notify  => Service['dnsmasq'],
     require => Package['dnsmasq'],
+  }
+  exec { 'add puppet server to dnsmasq.hosts file':
+    command => "cat /etc/hosts | grep puppet > /etc/dnsmasq.hosts",
+    provider => "shell",
+    creates => "/etc/dnsmasq.hosts",
+    before => File['vm use local dns'],
   }
   file { 'vm use local dns':
     content => "nameserver 127.0.0.1\n",
     path    => "/etc/resolv.conf",
-    require => [File['public dns servers'], File['dnsmasq configuration']],
+    require => Exec['restart dnsmasq'],
+  }
+  exec { 'restart dnsmasq':
+    command => "service dnsmasq restart",
+    provider => "shell",
+    require => [Exec['add puppet server to dnsmasq.hosts file'], File['dnsmasq configuration'], Package['dnsmasq']],
   }
 }
