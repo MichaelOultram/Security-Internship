@@ -37,7 +37,6 @@ class puppetdocker {
   file { 'dnsmasq configuration':
     source => "puppet:///modules/puppetdocker/dnsmasq.conf",
     path    => "/etc/dnsmasq.conf",
-    notify  => Service['dnsmasq'],
     require => Package['dnsmasq'],
   }
   exec { 'add puppet server to dnsmasq.hosts file':
@@ -49,6 +48,11 @@ class puppetdocker {
   file { 'vm use local dns':
     content => "nameserver 127.0.0.1\n",
     path    => "/etc/resolv.conf",
-    require => File['dnsmasq configuration'],
+    require => Exec['restart dnsmasq'],
+  }
+  exec { 'restart dnsmasq':
+    command => "service dnsmasq restart",
+    provider => "shell",
+    require => [Exec['add puppet server to dnsmasq.hosts file'], File['dnsmasq configuration'], Package['dnsmasq']],
   }
 }

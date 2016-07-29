@@ -4,11 +4,12 @@ FROM phusion/baseimage
 # Copy build and run scripts
 COPY ./build.sh /build.sh
 COPY ./fixip.sh /etc/my_init.d/fixip.sh
+COPY ./fixmisc.sh /etc/my_init.d/fixmisc.sh
 
 # Install puppet agent
 RUN TERM=dumb && \
     apt-get update && \
-    apt-get install -y wget iproute2 && \
+    apt-get install -y wget iproute2 iptables-persistent && \
     cd /tmp && \
     wget -q https://apt.puppetlabs.com/puppetlabs-release-pc1-wheezy.deb && \
     dpkg -i /tmp/puppetlabs-release-pc1-wheezy.deb && \

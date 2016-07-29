@@ -67,9 +67,8 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
     }
     exec { "add ${name} domain to hosts file":
       provider => "shell",
-      command => "echo \"$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${name}) ${name}\" >> /etc/dnsmasq.hosts",
+      command => "echo \"$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${name}) ${name}\" >> /etc/dnsmasq.hosts && service dnsmasq restart",
       unless => "cat /etc/dnsmasq.hosts | grep -c $(docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${name})",
-      notify => Service['dnsmasq'],
       require => Exec["wait-for-${name}-start"],
       before => Connect_to_network[$private_networks_joined],
     }
@@ -115,15 +114,15 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
 
   connect_to_network { $private_networks_tail:
     container => $name,
-    notify => Exec["fixip-${name}"],
+    notify => Docker::Exec["fixip-${name}"],
     require => Exec["wait-for-${name}-start"],
   }
 
   # Need to refix ip interfaces after docker has touched them
-  exec { "fixip-${name}":
-    command  => "docker exec ${name} /etc/my_init.d/fixip.sh",
-    provider => "shell",
-    require => Exec["wait-for-${name}-start"],
+  docker::exec { "fixip-${name}":
+    container => $name,
+    command   => '/bin/bash -c "/etc/my_init.d/fixip.sh"',
+    require   => Exec["wait-for-${name}-start"],
   }
 }
 
