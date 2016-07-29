@@ -3,50 +3,49 @@ class reverse {
 	require java
 	include clang
 	include jdgui
+	include ida
 
 	# -------------------REVERSE ENGINEERING WITH C++----------------------#
 	# ---------------------------------------------------------------------#
 
 	$password = genString() # Set the random string in here! with ruby
-	$tokenReverse = gentoken($reverse) # Set as a facter FACTER_reverse="ex51" puppet agent --test
+	$tokenReverse = gentoken("ex51")
 
-	if("${reverse}" != '') {
-		# Compile and move code to dan's folder and mistery folder
-		file { "reverse_engineer":
-			path => "/home/dan/RE.cpp",
-			content => template("reverse/RE.cpp.erb"),
-		      	owner => "dan",
-		 	group => "dan",
-	      		mode => "0700",
-			before => Exec["compile_engineering"],
-			require => File['/home/dan/'],
-		}
+	# Compile and move code to dan's folder and mistery folder
+	file { "reverse_engineer":
+		path => "/home/dan/RE.cpp",
+		content => template("reverse/RE.cpp.erb"),
+	      	owner => "dan",
+	 	group => "dan",
+      		mode => "0700",
+		before => Exec["compile_engineering"],
+		require => File['/home/dan/'],
+	}
 
-		file { '/home/mistery/reverseEngineering':
-			ensure => present,
-			source => "/home/dan/reverseEngineering",
-			require => Exec['compile_engineering'],
+	file { '/home/mistery/reverseEngineering':
+		ensure => present,
+		source => "/home/dan/reverseEngineering",
+		require => Exec['compile_engineering'],
 
-		}
+	}
 
-		exec { "compile_engineering":
-			command => "clang++ -std=c++11 -Werror -o reverseEngineering RE.cpp &&
-			rm RE.cpp && chown mistery:mistery reverseEngineering && chmod +s reverseEngineering",
-			path => '/usr/bin/:/bin',
-			cwd => '/home/dan/',
-			require => File['/home/dan/'],
-		}
+	exec { "compile_engineering":
+		command => "clang++ -std=c++11 -Werror -o reverseEngineering RE.cpp &&
+		rm RE.cpp && chown mistery:mistery reverseEngineering && chmod +s reverseEngineering",
+		path => '/usr/bin/:/bin',
+		cwd => '/home/dan/',
+		require => File['/home/dan/'],
+	}
 
-		# Move token in a file that cannot be read by user dan
-		file { "token_reverse_engineer":
-			path => "/home/dan/tokenRE.txt",
-			content => template("reverse/tokenRE.txt.erb"),
-		      	owner => "mistery",
-		 	group => "mistery",
-	      		mode => "0700",
-			before => Exec["compile_engineering"],
-			require => File['/home/dan/'],
-		}
+	# Move token in a file that cannot be read by user dan
+	file { "token_reverse_engineer":
+		path => "/home/dan/tokenRE.txt",
+		content => template("reverse/tokenRE.txt.erb"),
+	      	owner => "mistery",
+	 	group => "mistery",
+      		mode => "0700",
+		before => Exec["compile_engineering"],
+		require => File['/home/dan/'],
 	}
 	# ----------------------REVERSE ENGINEERING JAVA ----------------------#
 	# ---------------------------------------------------------------------#
