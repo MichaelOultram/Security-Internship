@@ -1,6 +1,8 @@
 class protocols ($protocols = "") {
 	require java
-	include wireshark
+	class { 'wireshark':
+	  require => File["charlie_home"],
+	}
 	require gentoken
 
 	# Command to run:
