@@ -12,6 +12,5 @@ class wine {
   package { 'winehq-devel':
     ensure => installed,
     install_options => ["--install-recommends"],
-    require => Apt::Ppa['ppa:wine/wine-builds'],
   }
 }

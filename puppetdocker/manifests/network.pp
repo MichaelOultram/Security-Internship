@@ -1,8 +1,5 @@
 # Creates a new private network
 # =============================
-# $domain:
-# The domain name of the network (e.g. example.vm)
-#
 # $cidr:
 # Classless Inter-Domain Routing. Specifies the ip range and subnet of the
 # private network. (e.g. 172.18.0.0/24)

@@ -14,13 +14,6 @@ class gateway {
     require => Package['iptables-persistent'],
   }
 
-  # Restore iptables when the machine starts
-  file { '/root/startup/iptables-restore.sh':
-    ensure => file,
-    content => "#!/bin/bash\niptables-restore < /etc/iptables/rules.v4\n",
-    mode => '0755',
-  }
-
   # Allow containers inside the network to access the outside world
   firewall { '000 nat eth0':
     chain    => 'POSTROUTING',

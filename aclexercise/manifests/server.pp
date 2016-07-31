@@ -1,4 +1,4 @@
-class aclexercise::server {
+class aclexercise::server ($charlie_keys) {
   node "server.acl.vm" {
     include sshserver
 
@@ -22,12 +22,12 @@ class aclexercise::server {
     }
 
     file { '/backup/charlie/.ssh/id_rsa.pub':
-      content => $aclexercise::nodes::charlie_keys[0],
+      content => $aclexercise::server::charlie_keys[0],
       require => File[$folders],
     }
 
     file { '/backup/charlie/.ssh/id_rsa':
-      content => $aclexercise::nodes::charlie_keys[1],
+      content => $aclexercise::server::charlie_keys[1],
       require => File[$folders],
     }
 

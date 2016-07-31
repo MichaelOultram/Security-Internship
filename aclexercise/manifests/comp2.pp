@@ -1,8 +1,8 @@
-class aclexercise::comp2 {
+class aclexercise::comp2 ($charlie_keys) {
   node "comp2.acl.vm" {
     include sshserver
 
-    # Comp1 has a "desktop"
+    # Comp2 has a "desktop"
     package { 'xorg':
       ensure => installed,
     }
@@ -20,12 +20,12 @@ class aclexercise::comp2 {
     }
 
     file { '/home/charlie/.ssh/id_rsa.pub':
-      content => $aclexercise::nodes::charlie_keys[0],
+      content => $aclexercise::comp2::charlie_keys[0],
       require => File[$folders],
     }
 
     file { '/home/charlie/.ssh/id_rsa':
-      content => $aclexercise::nodes::charlie_keys[1],
+      content => $aclexercise::comp2::charlie_keys[1],
       require => File[$folders],
     }
 

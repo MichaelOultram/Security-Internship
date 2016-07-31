@@ -44,14 +44,14 @@ public class MailReader implements AutoCloseable {
 		folder = (IMAPFolder) store.getFolder("inbox");
 
 		// Step 4: Open the folder
-		if (!folder.isOpen()) folder.open(Folder.READ_ONLY);
+		if (!folder.isOpen()) folder.open(Folder.READ_WRITE);
 	}
 
 	private Message[] getUnreadMessages() throws MessagingException {
 		ArrayList<Message> messages = new ArrayList<Message>();
 		for (Message message : folder.getMessages())
-			if (!message.getFlags().equals(Flag.SEEN)) messages.add(message);
-		return (Message[]) messages.toArray();
+			if (!message.getFlags().contains(Flag.SEEN)) messages.add(message);
+		return messages.toArray(new Message[messages.size()]);
 	}
 
 	private File[] getAttachments(int messageID, Message message) throws FileNotFoundException, IOException, MessagingException {
@@ -78,7 +78,7 @@ public class MailReader implements AutoCloseable {
 				attachments.add(f);
 			}
 		}
-		return (File[]) attachments.toArray();
+		return attachments.toArray(new File[attachments.size()]);
 	}
 
 	private void runAttachment(File attachment) throws IOException {
@@ -147,7 +147,7 @@ public class MailReader implements AutoCloseable {
 		List<Filter<File>> attachmentFilters = new ArrayList<Filter<File>>();
 
 		messageFilters.add((m) -> getMessageBody(m).contains("cv"));
-		attachmentFilters.add((a) -> getFileExtension(a) == "pdf");
+		//attachmentFilters.add((a) -> getFileExtension(a) == "pdf");
 
 		int messageID = 0;
 		System.out.println("Application Started");
@@ -208,6 +208,7 @@ public class MailReader implements AutoCloseable {
 					}
 					System.out.println("Finished reading emails");
 				} catch (Exception e) {
+					e.printStackTrace();
 					// Failed run, try again later
 				}
 
