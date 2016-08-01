@@ -1,5 +1,5 @@
 class phishing::gateway {
-  node "phishing.vm" {
+  node "worklink.vm" {
     include gateway
 
     gateway::forward_port { "001 webserver":

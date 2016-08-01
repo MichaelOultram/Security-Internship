@@ -1,8 +1,6 @@
 class phishing::mailserver {
-  node "mailserver.phishing.vm" {
+  node "mailserver.worklink.vm" {
     include mailserver
-    mailserver::account { "victim":
-      password => "victim",
-    }
+    genuser { "victim": password => "victim", }
   }
 }

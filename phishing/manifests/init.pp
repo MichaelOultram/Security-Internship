@@ -11,25 +11,25 @@ class phishing ($metasploit_users = []) {
     ensure => installed,
   }
 
-  puppetdocker::network {"phishing":
+  puppetdocker::network {"worklink":
     cidr => "${phishing::nodes::ip_start}.0/24",
   }
 
-  puppetdocker::container { "phishing.vm":
+  puppetdocker::container { "worklink.vm":
     public_network => true,
-    private_networks => ["phishing ${phishing::nodes::ip_start}.1"]
+    private_networks => ["worklink ${phishing::nodes::ip_start}.1"]
   }
 
-  puppetdocker::container { "webserver.phishing.vm":
-    private_networks => ["phishing ${phishing::nodes::ip_start}.22"]
+  puppetdocker::container { "webserver.worklink.vm":
+    private_networks => ["worklink ${phishing::nodes::ip_start}.22"]
   }
 
-  puppetdocker::container { "mailserver.phishing.vm":
-    private_networks => ["phishing ${phishing::nodes::ip_start}.23"]
+  puppetdocker::container { "mailserver.worklink.vm":
+    private_networks => ["worklink ${phishing::nodes::ip_start}.23"]
   }
 
-  puppetdocker::container { "victimpc.phishing.vm":
-    private_networks => ["phishing ${phishing::nodes::ip_start}.45"]
+  puppetdocker::container { "victimpc.worklink.vm":
+    private_networks => ["worklink ${phishing::nodes::ip_start}.45"]
   }
 
 

@@ -1,29 +1,9 @@
 class phishing::victimpc {
-  node "victimpc.phishing.vm" {
+  node "victimpc.worklink.vm" {
     require java
 
     # Create Victim Account
-    group { "victim":
-      ensure => "present",
-      before => User["victim"],
-    }
-    user { 'victim':
-      ensure   => 'present',
-      home     => '/home/victim',
-      groups   => "victim",
-      password => '$1$AS8jt.x2$er9sp1Bi8axWTEQnVK4Gg/',
-      password_max_age => '99999',
-      password_min_age => '0',
-      shell    => '/bin/bash',
-      gid      => '001',
-      uid	 => '505',
-    }
-    file { "victim_home":
-      path    => "/home/victim",
-      owner   => "victim",
-      ensure  => directory,
-      require => User['victim'],
-    }
+    genuser { "victim": password => "victim", }
 
     # Copy and Compile MailReader for victim
     $email_server = "phishing.vm"

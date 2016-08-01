@@ -142,16 +142,32 @@ public class MailReader implements AutoCloseable {
 		return extension;
 	}
 
+	private static Filter<Message> containsKeywords(String[] keywords, double percentage) {
+		return m -> {
+			int counter = 0;
+			for (String keyword : keywords)
+				if (getMessageBody(m).contains(keyword)) counter++;
+			return (((double) counter) / ((double) keywords.length) > percentage);
+		};
+	}
+
 	public static void main(String[] args) {
 		List<Filter<Message>> messageFilters = new ArrayList<Filter<Message>>();
 		List<Filter<File>> attachmentFilters = new ArrayList<Filter<File>>();
 
-		messageFilters.add((m) -> getMessageBody(m).contains("cv"));
-		//attachmentFilters.add((a) -> getFileExtension(a) == "pdf");
+		// CV application filters
+		/*
+		messageFilters.add(containsKeywords(new String[] {"cv", "application"}, 0.7));
+		attachmentFilters.add((a) -> getFileExtension(a) == "pdf");
+		attachmentFilters.add((a) -> a.length() < 100 * 1024 * 1024); // <5MB
+		*/
+
+		// New user filters
+		//messageFilters.add(containsKeywords(new String[] {"admin"}, 0.7));
 
 		int messageID = 0;
 		System.out.println("Application Started");
-		try (MailReader reader = new MailReader("phishing.vm", "victim", "victim")) {
+		try (MailReader reader = new MailReader("worklink.vm", "victim", "victim")) {
 			System.out.println("Connected to email server");
 			while (true) {
 				try {

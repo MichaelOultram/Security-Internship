@@ -1,5 +1,5 @@
 class phishing::webserver {
-  node "webserver.phishing.vm" {
+  node "webserver.worklink.vm" {
     $packages = ['apache2', 'php']
     package { $packages:
       ensure => installed,
@@ -11,7 +11,7 @@ class phishing::webserver {
     }->
     file { "/etc/my_init.d/webserver.sh":
       mode => "700",
-      content => "#!/bin/bash\nservice apache2 start\n/etc/init.d/php7.0-fpm start",
+      content => "#!/bin/bash\n/etc/init.d/php7.0-fpm start\nservice apache2 start\n",
     }
   }
 }
