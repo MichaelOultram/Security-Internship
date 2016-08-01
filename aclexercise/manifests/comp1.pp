@@ -1,4 +1,4 @@
-class aclexercise::comp1{
+class aclexercise::comp1 {
   node "comp1.acl.vm" {
     include sshserver
 
@@ -6,5 +6,8 @@ class aclexercise::comp1{
     package { 'xorg':
       ensure => installed,
     }
+
+    genuser { 'alice': password => "al1c3", }
+    genuser { 'bob': password => "b0bBy", }
   }
 }

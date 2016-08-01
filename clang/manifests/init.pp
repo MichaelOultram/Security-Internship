@@ -1,8 +1,8 @@
 class clang {
   exec { "apt-update":
-    command => 'sudo apt-get update',
-    path => '/usr/bin/:/bin',
-    before => Package['clang']
+    command => 'apt-get update',
+    provider => "shell",
+    before => Package['clang'],
   }
 
   package { 'clang':
