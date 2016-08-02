@@ -1,0 +1,18 @@
+<solution> 
+Easiest way is to open it with ida
+
+For the first buffer overflow exercise you need to simply overwrite the return address with the address of the "function2()". This opens a file with the token inside it.
+
+For the second buffer overflow exercise you need to overwrite the return address with the address of the "function3()". This "function3()" contains an array that will have all the elements from the initial buffer. This way you can overwrite the return address again with the address of the "function2()" that will open a file with the token inside it.
+
+</solution>
+
+<description> 
+
+Address space randomisation must be turned off in order for the exercises to work. This module has two buffer overflow exercises that once solved, they open different files that contain tokens in them.
+
+</description>
+
+<hints> 
+Overflow the buffer until you change the address of the return address
+</hints>
