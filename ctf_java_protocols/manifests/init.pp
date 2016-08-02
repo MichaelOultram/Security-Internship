@@ -30,7 +30,7 @@ class ctf_java_protocols ($protocols = "") {
 		command => "rm Encrypt*",
 		path => '/usr/bin/:/bin',
 		cwd => '/root/',
-		require => Protocols::Install_protocol[$protocolsArray],
+		require => Ctf_java_protocols::Install_protocol[$protocolsArray],
 	}
 
 	# Setup Protocol Loader
