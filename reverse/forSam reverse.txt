@@ -1,0 +1,13 @@
+<solution>
+
+Open the executable with ida and simply match each character with the one that the program is checking. The character before the last needs to be 1 lower than the previous one. The last character has to be higher than the third character. Entering the correct string will open a file with the token inside it.
+
+</solution>
+
+<description>
+This module contains a reverse engineering exercise which is compiled in c++. Solving the exercise will open a file with a token inside it.
+</description>
+
+<hints>
+Open the executable it with ida and match each character
+</hints>

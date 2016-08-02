@@ -9,7 +9,7 @@ class reverse {
 	# ---------------------------------------------------------------------#
 
 	$password = genString() # Set the random string in here! with ruby
-	$tokenReverse = gentoken("ex51")
+	$tokenReverse = gentoken("ex53")
 
 	# Compile and move code to dan's folder and mistery folder
 	file { "reverse_engineer":
@@ -49,6 +49,18 @@ class reverse {
 	}
 	# ----------------------REVERSE ENGINEERING JAVA ----------------------#
 	# ---------------------------------------------------------------------#
+
+	# Copy the exercise1.jar file into user dan's folder
+	file { '/home/dan/exercise1.jar':
+		ensure => present,
+		source => "puppet:///modules/reverse/exercise1.jar/",
+	}
+
+	# Copy the exercise2.jar file into user dan's folder
+	file { '/home/dan/exercise2.jar':
+		ensure => present,
+		source => "puppet:///modules/reverse/exercise2.jar/",
+	}
 
 	# Create Dan Account
 	group { "dan":
