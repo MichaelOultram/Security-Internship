@@ -9,5 +9,9 @@ class aclexercise::comp1 {
 
     genuser { 'alice': password => "al1c3", }
     genuser { 'bob': password => "b0bBy", }
+
+    file { "/home/bob":
+      ensure => directory,
+    }
   }
 }

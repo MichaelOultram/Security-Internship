@@ -20,10 +20,13 @@ class metasploit($location = "/opt", $users = []) {
     cwd => $location,
   }->
   exec { "bundle":
-    command => '/bin/bash --login -c "gem install bundle && bundle install"',
+    command => '/bin/bash --login -c "rvm @global do gem install bundle && rvm @global do bundle install"',
     path =>'/usr/local/rvm/bin:/usr/local/rvm/rubies/ruby-2.3.1/bin:/usr/bin/:/bin:/usr/local/bin',
     cwd =>"${location}/metasploit",
     require => Rvm_system_ruby['ruby-2.3.1'],
+  }->
+  file_line { "/etc/profile":
+    line => "export PATH=/opt/metasploit:$PATH",
   }
 
   # Make sure all users are in the rvm group

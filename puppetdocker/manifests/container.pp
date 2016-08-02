@@ -39,6 +39,7 @@ define puppetdocker::container($public_network = false, $private_networks = []) 
     require => [Exec["${name} container not built?"], Docker::Run["build-${name}"]],
     provider => 'shell',
     command => "docker wait build-${name}",
+    timeout => 0,
   }-> # Create an image from the build container and change the startup command
   exec { "${name} image":
     provider => 'shell',

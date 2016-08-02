@@ -1,23 +1,23 @@
 class phishing::victimpc {
   node "victimpc.worklink.vm" {
     require java
+    class { "adobereader":
+      user => "root",
+    }
 
     # Create Victim Account
     genuser { "victim": password => "victim", }
 
     # Copy and Compile MailReader for victim
-    $email_server = "phishing.vm"
-    $email_user = "victim"
-    $email_pass = "victim"
     file { "/home/victim/mail.jar":
       source => "puppet:///modules/phishing/mail.jar",
       owner => "victim",
-      require => File['victim_home'],
+      require => Genuser['victim'],
     }
     file { "/home/victim/MailReader.java":
-      content => template("phishing/MailReader.java.erb"),
+      content => epp("phishing/MailReader.java.epp", {'server' => "${phishing::nodes::ip_start}.23", 'user' => 'victim', 'pass' => 'victim'}),
       owner => "victim",
-      require => File['victim_home'],
+      require => Genuser['victim'],
     }
     exec { 'compile MailReader':
       command => 'javac -cp mail.jar MailReader.java',
