@@ -8,8 +8,8 @@ class bufferoverflow {
 	#Contains both the easy and hard exercise
 
 	$bufferSize = randNumber()
-	$tokenOverflow1 = gentoken(join(["ex52", "-", $bufferSize, "-"]))
-	$tokenOverflow2 = gentoken("ex53")
+	$tokenOverflow1 = gentoken(join(["ex54", "-", $bufferSize, "-"]))
+	$tokenOverflow2 = gentoken("ex55")
 
 	file { "buffer_overflow_easy":
 		path => "/home/dan/nameCheck.c",
