@@ -1,4 +1,4 @@
-class reverse {
+class ctf_reverse_engineering {
 
 	require java
 	include clang
@@ -14,7 +14,7 @@ class reverse {
 	# Compile and move code to dan's folder and mistery folder
 	file { "reverse_engineer":
 		path => "/home/dan/RE.cpp",
-		content => template("reverse/RE.cpp.erb"),
+		content => template("ctf_reverse_engineering/RE.cpp.erb"),
 	      	owner => "dan",
 	 	group => "dan",
       		mode => "0700",
@@ -40,7 +40,7 @@ class reverse {
 	# Move token in a file that cannot be read by user dan
 	file { "token_reverse_engineer":
 		path => "/home/dan/tokenRE.txt",
-		content => template("reverse/tokenRE.txt.erb"),
+		content => template("ctf_reverse_engineering/tokenRE.txt.erb"),
 	      	owner => "mistery",
 	 	group => "mistery",
       		mode => "0700",
@@ -53,13 +53,13 @@ class reverse {
 	# Copy the exercise1.jar file into user dan's folder
 	file { '/home/dan/exercise1.jar':
 		ensure => present,
-		source => "puppet:///modules/reverse/exercise1.jar/",
+		source => "puppet:///modules/ctf_reverse_engineering/exercise1.jar/",
 	}
 
 	# Copy the exercise2.jar file into user dan's folder
 	file { '/home/dan/exercise2.jar':
 		ensure => present,
-		source => "puppet:///modules/reverse/exercise2.jar/",
+		source => "puppet:///modules/ctf_reverse_engineering/exercise2.jar/",
 	}
 
 	# Create Dan Account
@@ -94,7 +94,7 @@ class reverse {
 		ensure   => 'present',
 		home     => '/home/mistery',
 		groups   => "mistery",
-		password => '$1$xyz$GuUjxxPDncQ3w26IlSFn10',
+		password => '$1$VIqB1s2z$pDVEY8hqqjfgtCESmmteA.', #mistery
 		password_max_age => '99999',
     		password_min_age => '0',
 		shell    => '/bin/bash',

@@ -1,5 +1,5 @@
 
-class bufferoverflowctf {
+class ctf_buffer_overflow {
 
 	include clang
 	include ida
@@ -13,7 +13,7 @@ class bufferoverflowctf {
 
 	file { "buffer_overflow_easy":
 		path => "/home/dan/nameCheck.c",
-		content => template("bufferoverflowctf/nameCheck.c.erb"),
+		content => template("ctf_buffer_overflow/nameCheck.c.erb"),
 	      	owner => "dan",
 	 	group => "dan",
       		mode => "0700",
@@ -23,7 +23,7 @@ class bufferoverflowctf {
 
 	file { "buffer_overflow_hard":
 		path => "/home/dan/nameCheckHard.c",
-		content => template("bufferoverflowctf/nameCheckHard.c.erb"),
+		content => template("ctf_buffer_overflow/nameCheckHard.c.erb"),
 	      	owner => "dan",
 	 	group => "dan",
       		mode => "0700",
@@ -62,7 +62,7 @@ class bufferoverflowctf {
 	# Move token in a file that cannot be read by user dan
 	file { "token_buffer_overflow_easy":
 		path => "/home/dan/overflowToken1.txt",
-		content => template("bufferoverflowctf/overflowToken1.txt.erb"),
+		content => template("ctf_buffer_overflow/overflowToken1.txt.erb"),
 	      	owner => "mistery",
 	 	group => "mistery",
       		mode => "0700",
@@ -72,7 +72,7 @@ class bufferoverflowctf {
 
 	file { "token_buffer_overflow_hard":
 		path => "/home/dan/overflowToken2.txt",
-		content => template("bufferoverflowctf/overflowToken2.txt.erb"),
+		content => template("ctf_buffer_overflow/overflowToken2.txt.erb"),
 	      	owner => "mistery",
 	 	group => "mistery",
       		mode => "0700",

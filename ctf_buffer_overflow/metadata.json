@@ -1,5 +1,5 @@
 {
-  "name": "vagrant-bufferoverflowctf",
+  "name": "vagrant-ctf_buffer_overflow",
   "version": "0.1.0",
   "author": "vagrant",
   "summary": "Buffer overflow exercise randomised",
