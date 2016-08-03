@@ -1,4 +1,4 @@
-class mailserver {
+class mailserver($hostname) {
   package { 'postfix':
     ensure => installed,
   }
@@ -27,6 +27,22 @@ class mailserver {
   file_line { "No tls on SMTP":
     line => "smtpd_use_tls=no",
     match => "^smtpd_use_tls=yes$",
+    path => "/etc/postfix/main.cf",
+    require => Package['postfix'],
+    notify => Service['postfix'],
+  }
+
+  file_line { "Update mynetworks":
+    line => "mynetworks = 127.0.0.0/8 172.0.0.0/8",
+    match => "^mynetworks",
+    path => "/etc/postfix/main.cf",
+    require => Package['postfix'],
+    notify => Service['postfix'],
+  }
+
+  file_line { "Set Hostname":
+    line => "myhostname = ${hostname}",
+    match => "^myhostname",
     path => "/etc/postfix/main.cf",
     require => Package['postfix'],
     notify => Service['postfix'],

@@ -5,7 +5,10 @@ define genuser($username = $name, $password, $gid = $username, $has_home = true,
   }
 
   user { $username:
-    home => "/home/${username}",
+    home => ($username == root) ? {
+      true => "/root",
+      false => "/home/${username}",
+    },
     gid => $gid,
     ensure => present,
     managehome => $has_home,

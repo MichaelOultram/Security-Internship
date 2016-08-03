@@ -45,14 +45,19 @@ class puppetdocker {
     creates => "/etc/dnsmasq.hosts",
     before => File['vm use local dns'],
   }
-  file { 'vm use local dns':
-    content => "nameserver 127.0.0.1\n",
-    path    => "/etc/resolv.conf",
-    require => Exec['restart dnsmasq'],
-  }
   exec { 'restart dnsmasq':
     command => "service dnsmasq restart",
     provider => "shell",
     require => [Exec['add puppet server to dnsmasq.hosts file'], File['dnsmasq configuration'], Package['dnsmasq']],
+  }
+  file_line { "Stop network manager breaking resolv.conf":
+    path => "/etc/NetworkManager/NetworkManager.conf",
+    line => "dns=none",
+    after => "\[main\]",
+  }
+  file { 'vm use local dns':
+    content => "nameserver 127.0.0.1\n",
+    path    => "/etc/resolv.conf",
+    require => [File_line["Stop network manager breaking resolv.conf"], Exec['restart dnsmasq']],
   }
 }

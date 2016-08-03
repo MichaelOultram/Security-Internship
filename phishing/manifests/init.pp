@@ -1,6 +1,8 @@
 class phishing ($metasploit_users = []) {
   include puppetdocker
-  include mailserver
+  class { "mailserver":
+    hostname => "local.vm",
+  }
   if $metasploit_users != [] {
     class { "metasploit":
       users => $metasploit_users,
