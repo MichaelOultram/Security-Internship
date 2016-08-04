@@ -18,4 +18,12 @@ class ida {
 		creates => "/home/dan/tools/idademo69/",
 		require => Exec['retrieve_ida'],
 	}
+
+	file { "tools_dan":
+		path    => "/home/dan/tools",
+		owner   => "dan",
+		ensure  => directory,
+		require => User['dan'],
+		before => Exec["retrieve_jdgui"],
+	}
 }

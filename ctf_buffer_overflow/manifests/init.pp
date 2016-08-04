@@ -3,6 +3,7 @@ class ctf_buffer_overflow {
 
 	include clang
 	include ida
+	include jdgui
 
 	#Copy the buffer overflow exercises to dan's home and mistery's home
 	#Contains both the easy and hard exercise
