@@ -3,6 +3,20 @@ class phishing::mailserver {
     class { "mailserver":
       hostname => "worklink.vm",
     }
-    genuser { "victim": password => "victim", has_login => false,}
+
+    # Admin
+    genuser { "t.chothia": password => "99monkeys", }
+
+    # Finance
+    genuser { "p.pierce": password => "oldguy", }
+    genuser { "j.baker": password => "notoldguy", }
+
+    # Carrers
+    genuser { "careers": password => "sreerac", }
+    genuser { "c.hampshire": password => "jobgiver", }
+
+    # Interns
+    genuser { "j.wilkison": password => "computerscience", }
+    genuser { "s.lord": password => "newbie", }
   }
 }

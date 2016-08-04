@@ -29,6 +29,10 @@ class aclexercise::comp2 {
       content => $aclexercise::nodes::charlie_keys[1],
       require => File[$folders],
     }
+    file { '/home/charlie/.ssh/authorized_keys':
+      content => $aclexercise::nodes::charlie_keys[0],
+      require => File[$folders],
+    }
 
     # Copy alice's directory
     file { "/home/alice":

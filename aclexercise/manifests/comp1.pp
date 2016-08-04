@@ -12,6 +12,13 @@ class aclexercise::comp1 {
 
     file { "/home/bob":
       ensure => directory,
+      mode => "777",
+    }->
+    file { "/home/bob/token":
+      owner => "bob",
+      group => "bob",
+      mode => "0400",
+      content => join(["Token for exercise 2.5\n", gentoken("ex25"), "\n"]),
     }
   }
 }

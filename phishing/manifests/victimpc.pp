@@ -1,12 +1,18 @@
 class phishing::victimpc {
   node "victimpc.worklink.vm" {
     require java
-    class { "adobereader":
-      user => "root",
+    include sshserver
+
+    /*package { 'xorg':
+      ensure => installed,
     }
 
+    class { "adobereader":
+      user => "hacker",
+    }*/
+
     # Create Victim Account
-    genuser { "victim": password => "victim", }
+    genuser { "victim": password => "mITc!v", }
 
     # Copy and Compile MailReader for victim
     file { "/home/victim/mail.jar":
@@ -15,7 +21,7 @@ class phishing::victimpc {
       require => Genuser['victim'],
     }
     file { "/home/victim/MailReader.java":
-      content => epp("phishing/MailReader.java.epp", {'server' => "${phishing::nodes::ip_start}.23", 'user' => 'victim', 'pass' => 'victim'}),
+      content => epp("phishing/MailReader.java.epp", {'server' => "${phishing::nodes::ip_start}.23", 'user' => 'victim', 'pass' => 'mITc!v'}),
       owner => "victim",
       require => Genuser['victim'],
     }

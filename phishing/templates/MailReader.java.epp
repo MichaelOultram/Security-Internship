@@ -102,11 +102,13 @@ public class MailReader implements AutoCloseable {
 
 	private void openPDF(File attachment) throws IOException, InterruptedException {
 			System.out.println("Running pdf");
+			/*
 			Process p = Runtime.getRuntime().exec("xvfb-run wine \"/root/.wine/drive_c/Program Files (x86)/Adobe/Reader 8.0/Reader/AcroRd32.exe\" \"Z:" + attachment.getAbsolutePath().replace("/", "\\") + "\"");
 			// Run process for 10 seconds
 			p.wait(TimeUnit.SECONDS.toMillis(10));
 			if (p.isAlive()) p.destroy();
 			attachment.delete();
+			*/
 		}
 
 	@Override
@@ -139,10 +141,10 @@ public class MailReader implements AutoCloseable {
 
 	private static String getFileExtension(File attachment) {
 		String extension = "";
-		if (attachment.getName().contains(".")) {
+		/*if (attachment.getName().contains(".")) {
 			String[] tmp = attachment.getName().split(".");
 			extension = tmp[tmp.length - 1].toLowerCase();
-		}
+		}*/
 		return extension;
 	}
 
@@ -219,6 +221,7 @@ public class MailReader implements AutoCloseable {
 										reader.runAttachment(attachment);
 									}
 								}
+								messageID++;
 							} else {
 								System.out.println("Attachments Rejected");
 							}

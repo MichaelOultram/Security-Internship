@@ -1,6 +1,6 @@
 <?php
 
-  $target_dir = "C:\\wamp64\\www\\php_test\\Action\\uploads\\";
+  $target_dir = "/var/www/html/Action/uploads/";
   $target_file = $target_dir . basename($_FILES["cv"]["name"]);
   $FileType = pathinfo($target_file,PATHINFO_EXTENSION);
   $uploadOk = 1;
@@ -8,10 +8,10 @@
   $name = $_POST['name'];
   $job = $_POST['job'];
 
-  require_once('Action/PHPMailer-master/class.phpmailer.php');
+  require_once("/var/www/html/Action/PHPMailer-master/class.phpmailer.php");
 
   // Allow certain file formats
-  if($FileType != "ods" || $FileType != "odt") {
+  if($FileType != "odt") {
       echo "<p>Sorry, only ODT/ODS files are allowed.</p>";
       $uploadOk = 0;
   }
@@ -29,11 +29,9 @@
       $email->FromName  = 'careers';
       $email->Subject   = 'New Application';
       $email->Body      = $bodytext;
-      $email->AddAddress( 'c.hampshire@wokrlink.vm' );
+      $email->AddAddress( 'c.hampshire@worklink.vm' );
 
-      $file_to_attach = $_FILES["cv"]["name"];
-
-      $email->AddAttachment( $file_to_attach , 'cv.pdf' );
+      $email->AddAttachment( $target_file, 'cv.odt' );
 
       return $email->Send();
     }

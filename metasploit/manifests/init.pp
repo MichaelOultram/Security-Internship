@@ -26,7 +26,14 @@ class metasploit($location = "/opt", $users = []) {
     require => Rvm_system_ruby['ruby-2.3.1'],
   }->
   file_line { "/etc/profile":
-    line => "export PATH=/opt/metasploit:$PATH",
+    path => "/etc/profile",
+    line => "export PATH=/opt/metasploit:\$PATH",
+  }->
+  exec { "fix_path":
+    command => '/bin/bash --login -c "rvm get stable --auto-dotfiles"',
+    path =>'/usr/local/rvm/bin:/usr/local/rvm/rubies/ruby-2.3.1/bin:/usr/bin/:/bin:/usr/local/bin',
+    cwd =>"${location}/metasploit",
+    require => Rvm_system_ruby['ruby-2.3.1'],
   }
 
   # Make sure all users are in the rvm group
