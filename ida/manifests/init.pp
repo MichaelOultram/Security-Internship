@@ -24,6 +24,6 @@ class ida {
 		owner   => "dan",
 		ensure  => directory,
 		require => User['dan'],
-		before => Exec["retrieve_jdgui"],
+		before => Exec["retrieve_ida"],
 	}
 }
