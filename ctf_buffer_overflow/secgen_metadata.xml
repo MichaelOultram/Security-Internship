@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+
+<vulnerability xmlns="http://www.github/cliffe/SecGen/vulnerability"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.github/cliffe/SecGen/vulnerability">
+  <name>CTF Buffer Overflow</name>
+  <author>Paul Popa</author>
+  <module_license>MIT</module_license>
+  <description>Address space randomisation must be turned off in order for the exercises to work. This module has two buffer overflow exercises that once solved, they open different files that contain tokens in them.</description>
+
+  <type>protocols</type>
+  <privilege>root</privilege>
+  <access>local</access>
+  <platform>linux</platform>
+  <realism>challenge</realism>
+
+  <!--optional vulnerability details-->
+  <difficulty>medium</difficulty>
+  <!--<cve></cve>-->
+  <cvss_base_score>1.5</cvss_base_score>
+  <cvss_vector>AV:L/AC:M/Au:S/C:P/I:N/A:N</cvss_vector>
+ 
+  <software_name></software_name>
+  <software_license></software_license>
+
+  <!--optional breadcrumb (info that is leaked and required to exploit)-->
+  <!--<breadcrumb></breadcrumb>-->
+
+  <!--optional hints-->
+  <!--<msf_module></msf_module>-->
+  <hint>Use IDA to view the stack, then overflow the buffer until you change the address of the return address.</hint>
+  <solution>For the first buffer overflow exercise you need to simply overwrite the return address with the address of the "function2()". This opens a file with the token inside it.
+
+For the second buffer overflow exercise you need to overwrite the return address with the address of the "function3()". This "function3()" contains an array that will have all the elements from the initial buffer. This way you can overwrite the return address again with the address of the "function2()" that will open a file with the token inside it.</solution>
+
+</vulnerability>
