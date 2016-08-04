@@ -79,4 +79,50 @@ class ctf_buffer_overflow {
 		before => Exec["compile_overflow_hard"],
 		require => File['/home/dan/'],
 	}
+
+	# Create Dan Account
+	group { "dan":
+		ensure => "present",
+		before => User["dan"],
+	}
+	user { 'dan':
+		ensure   => 'present',
+		home     => '/home/dan',
+		groups   => "dan",
+		password => '$1$xyz$GuUjxxPDncQ3w26IlSFn10',
+		password_max_age => '99999',
+    		password_min_age => '0',
+		shell    => '/bin/bash',
+		gid      => '001',
+		uid	 => '506',
+	}
+	file { "dan_home":
+		path    => "/home/dan",
+		owner   => "dan",
+		ensure  => directory,
+		require => User['dan'],
+	}
+
+	# Create mistery Account
+	group { "mistery":
+		ensure => "present",
+		before => User["mistery"],
+	}
+	user { 'mistery':
+		ensure   => 'present',
+		home     => '/home/mistery',
+		groups   => "mistery",
+		password => '$1$VIqB1s2z$pDVEY8hqqjfgtCESmmteA.', #mistery
+		password_max_age => '99999',
+    		password_min_age => '0',
+		shell    => '/bin/bash',
+		gid      => '001',
+		uid	 => '507',
+	}
+	file { "mistery_home":
+		path    => "/home/mistery",
+		owner   => "mistery",
+		ensure  => directory,
+		require => User['mistery'],
+	}
 }
