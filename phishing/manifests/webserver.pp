@@ -31,7 +31,7 @@ class phishing::webserver {
     genuser { "t.chothia": password => "99monkeys", }
 
     # Finance
-    genuser { "p.pierce": password => "oldguy", }
+    genuser { "m.pierce": password => "oldguy", }
     genuser { "j.baker": password => "notoldguy", }
 
     # Carrers

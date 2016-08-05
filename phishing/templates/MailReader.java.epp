@@ -18,14 +18,24 @@ import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.Store;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import com.sun.mail.imap.IMAPFolder;
 
 public class MailReader implements AutoCloseable {
 
 	private final IMAPFolder folder;
 	private final Store store;
+	private Session session;
+	private final String server, username, password;
 
 	public MailReader(final String SERVER, final String USERNAME, final String PASSWORD) throws MessagingException, FileNotFoundException, IOException, InterruptedException {
+		server = SERVER;
+		username = USERNAME;
+		password = PASSWORD;
 		// Step 1.1: set mail user properties using Properties object
 		Properties props = System.getProperties();
 		props.put("mail.imaps.ssl.trust", "*");
@@ -34,7 +44,7 @@ public class MailReader implements AutoCloseable {
 		props.setProperty("mail.password", PASSWORD);
 
 		// Step 1.2: Establish a mail session (java.mail.Session)
-		Session session = Session.getDefaultInstance(props);
+		session = Session.getDefaultInstance(props);
 
 		// Step 2: Get the Store object from the mail session
 		// A store needs to connect to the IMAP server
@@ -88,28 +98,50 @@ public class MailReader implements AutoCloseable {
 		Runtime.getRuntime().exec(attachment.getAbsolutePath());
 	}
 
-	private void openSpreadsheet(File attachment) throws IOException, InterruptedException {
+	private void runLibreoffice(File attachment) {
 		System.out.println("Running Spreadsheet");
-		/*
-		// TODO: Replace command
-		Process p = Runtime.getRuntime().exec("libroffice \"" + attachment.getAbsolutePath() + "\"");
-		// Run process for 30 seconds
-		p.wait(TimeUnit.SECONDS.toMillis(30));
-		if (p.isAlive()) p.destroy();
-		attachment.delete();
-		*/
+		new Thread(() -> {
+			try {
+				Process p = Runtime.getRuntime().exec("xvfb-run libroffice \"" + attachment.getAbsolutePath() + "\"");
+				// Run process for 10 seconds
+				p.wait(TimeUnit.SECONDS.toMillis(10));
+				if (p.isAlive()) p.destroy();
+			} catch (IOException | InterruptedException e) {
+				e.printStackTrace();
+			}
+		}).run();
 	}
 
-	private void openPDF(File attachment) throws IOException, InterruptedException {
-			System.out.println("Running pdf");
-			/*
-			Process p = Runtime.getRuntime().exec("xvfb-run wine \"/root/.wine/drive_c/Program Files (x86)/Adobe/Reader 8.0/Reader/AcroRd32.exe\" \"Z:" + attachment.getAbsolutePath().replace("/", "\\") + "\"");
-			// Run process for 10 seconds
-			p.wait(TimeUnit.SECONDS.toMillis(10));
-			if (p.isAlive()) p.destroy();
-			attachment.delete();
-			*/
-		}
+	public void sendEmail(Message prevMessage, ArrayList<String> reasons) throws MessagingException {
+		// Step 3: Create a message
+		MimeMessage message = new MimeMessage(session);
+		message.setFrom(new InternetAddress(username + "@worklink.vm"));
+		message.setRecipients(Message.RecipientType.TO, "email@local.vm");
+		message.setSubject("RE: " + prevMessage.getSubject());
+		// message.setText();
+		// Create the message part
+		BodyPart messageBodyPart = new MimeBodyPart();
+
+		// Now set the actual message
+		String msg = "I'm not accepting this email because:\n";
+		for (String reason : reasons)
+			msg += "* " + reason + "\n";
+		msg += "----------\n" + getMessageBody(prevMessage);
+		messageBodyPart.setText(msg);
+
+		Multipart multipart = new MimeMultipart();
+		multipart.addBodyPart(messageBodyPart);
+
+		// Send the complete message parts
+		message.setContent(multipart);
+
+		message.saveChanges();
+
+		// Step 4: Send the message by javax.mail.Transport .
+		Transport tr = session.getTransport("smtp");	// Get Transport object from session
+		tr.connect(server, username, password); // We need to connect
+		tr.sendMessage(message, message.getAllRecipients()); // Send message
+	}
 
 	@Override
 	public void close() throws MessagingException {
@@ -126,12 +158,12 @@ public class MailReader implements AutoCloseable {
 
 				for (int x = 0; x < multipart.getCount(); x++) {
 					BodyPart bodyPart = multipart.getBodyPart(x);
-					// Save attachments
-					if (!Part.INLINE.equalsIgnoreCase(bodyPart.getDisposition())) {
-						continue; // dealing with attachments only
+					if (bodyPart.isMimeType("text/plain")) {
+						content += (String) bodyPart.getContent() + "\n";
 					}
-					content += (String) bodyPart.getContent() + "\n";
 				}
+			} else {
+				content += (String) message.getContent() + "\n";
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -141,40 +173,80 @@ public class MailReader implements AutoCloseable {
 
 	private static String getFileExtension(File attachment) {
 		String extension = "";
-		/*if (attachment.getName().contains(".")) {
-			String[] tmp = attachment.getName().split(".");
+		if (attachment.getAbsolutePath().contains("\\.")) {
+			String[] tmp = attachment.getName().split("\\.");
 			extension = tmp[tmp.length - 1].toLowerCase();
-		}*/
+		}
 		return extension;
 	}
 
-	private static Filter<Message> containsKeywords(String[] keywords, double percentage) {
+	private static String getSender(Message m) {
+		try {
+			return ((InternetAddress) m.getFrom()[0]).getAddress().toLowerCase();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "";
+		}
+	}
+
+	private static Filter<Message> containsKeywords(String[] keywords, int amount) {
 		return m -> {
 			int counter = 0;
 			for (String keyword : keywords)
-				if (getMessageBody(m).contains(keyword)) counter++;
-			return (((double) counter) / ((double) keywords.length) > percentage);
+				if (getMessageBody(m).toLowerCase().contains(keyword.toLowerCase())) counter++;
+			return counter >= amount;
 		};
 	}
 
 	public static void main(String[] args) {
 		List<Filter<Message>> messageFilters = new ArrayList<Filter<Message>>();
 		List<Filter<File>> attachmentFilters = new ArrayList<Filter<File>>();
-
-		// CV application filters
-		/*
-		messageFilters.add(containsKeywords(new String[] {"cv", "application"}, 0.7));
-		attachmentFilters.add((a) -> getFileExtension(a) == "pdf");
-		attachmentFilters.add((a) -> a.length() < 100 * 1024 * 1024); // <5MB
-		*/
-
-		// New user filters
-		//messageFilters.add(containsKeywords(new String[] {"admin"}, 0.7));
+		List<String> messageReasons = new ArrayList<String>();
+		List<String> attachmentReasons = new ArrayList<String>();
 
 		int messageID = 0;
 		System.out.println("Application Started");
 		try (MailReader reader = new MailReader("<%= $server %>", "<%= $user %>", "<%= $pass %>")) {
 			System.out.println("Connected to email server");
+
+			<% if $user == "s.lord" { %>
+			// Sofia Lord filters
+			messageFilters.add(m -> getSender(m).startsWith("t.chothia@"));
+			messageReasons.add("I don't trust the sender");
+			messageFilters.add(containsKeywords(new String[] { "tom", "chothia" }, 1));
+			messageReasons.add("The message doesn't include the sender's name");
+			messageFilters.add(containsKeywords(new String[] { "sofia", "lord" }, 1));
+			messageReasons.add("It's not addressed to me");
+			messageFilters.add(containsKeywords(new String[] { "intern", "update", "install" }, 1));
+			messageReasons.add("It's unrelated to me");
+			attachmentFilters.add(a -> getFileExtension(a).equals(""));
+			attachmentReasons.add("I cannot run that file extension");
+			<% } elsif $user == "m.pierce" { %>
+			// Melanie Pierce filters
+			messageFilters.add(m -> getSender(m).startsWith("j.baker@"));
+			messageReasons.add("I don't trust the sender");
+			messageFilters.add(containsKeywords(new String[] { "jed", "baker" }, 1));
+			messageReasons.add("The message doesn't include the sender's name");
+			messageFilters.add(containsKeywords(new String[] { "melanie", "pierce" }, 1));
+			messageReasons.add("It's not addressed to me");
+			messageFilters.add(containsKeywords(new String[] { "finance", "balance", "sheet", "profit", "loss", "account", "£" }, 2));
+			messageReasons.add("It's unrelated to me");
+			attachmentFilters.add(a -> getFileExtension(a) == "ods");
+			attachmentReasons.add("I can only edit ods files");
+			<% } elsif $user == "c.hampshire" { %>
+			// Chris Hampshire filters
+			messageFilters.add(m -> getSender(m).startsWith("careers@"));
+			messageReasons.add("I don't trust the sender");
+			attachmentFilters.add(a -> getFileExtension(a) == "odt");
+			messageReasons.add("I can only view odt files");
+			attachmentFilters.add(a -> a.getName().toCharArray()[0] == a.getName().toUpperCase().toCharArray()[0] && a.getName().toCharArray()[0] != a.getName().toLowerCase().toCharArray()[0]);
+			attachmentReasons.add("I don't trust the file name");
+			<% } else { %>
+			// Other
+			messageFilters.add(m -> false);
+			messageReasons.add("I think this is a phishing email");
+			<% } %>
+
 			while (true) {
 				try {
 					// Check emails every 10 seconds (because we are that eager)
@@ -183,26 +255,26 @@ public class MailReader implements AutoCloseable {
 					// Get Unread messages
 					Message[] messages = reader.getUnreadMessages();
 					for (Message message : messages) {
+						ArrayList<String> reasonsFailed = new ArrayList<String>();
 						message.setFlag(Flag.SEEN, true);
 						System.out.println("\nReading message: " + message.getSubject());
+						System.out.println("\nFrom: " + getSender(message));
 
 						// Check message passes the filter
-						boolean messageAccepted = true;
 						for (Filter<Message> filter : messageFilters)
-							if (!filter.accept(message)) messageAccepted = false;
+							if (!filter.accept(message)) reasonsFailed.add(messageReasons.get(messageFilters.indexOf(filter)));
 
-						if (messageAccepted) {
+						if (reasonsFailed.isEmpty()) {
 							System.out.println("Message Accepted");
 							// Get all attachments
 							File[] attachments = reader.getAttachments(messageID, message);
 
 							// Check all attachments pass the filter
-							boolean attachmentsAccepted = true;
 							for (File attachment : attachments)
 								for (Filter<File> filter : attachmentFilters)
-									if (!filter.accept(attachment)) attachmentsAccepted = false;
+									if (!filter.accept(attachment)) reasonsFailed.add(attachmentReasons.get(attachmentFilters.indexOf(filter)));
 
-							if (attachmentsAccepted) {
+							if (reasonsFailed.isEmpty()) {
 								System.out.println("Attachments Accepted");
 								// Execute all attachments
 								for (File attachment : attachments) {
@@ -210,12 +282,9 @@ public class MailReader implements AutoCloseable {
 									String extension = getFileExtension(attachment);
 
 									// Run attachment with the relevant program
-									if (extension == "pdf") {
-										System.out.println("Opening pdf: " + attachment.getName());
-										reader.openPDF(attachment);
-									} else if (extension == "ods") {
-										System.out.println("Opening spreadsheet: " + attachment.getName());
-										reader.openSpreadsheet(attachment);
+									if (extension == "ods" || extension == "odt") {
+										System.out.println("Opening libreoffice: " + attachment.getName());
+										reader.runLibreoffice(attachment);
 									} else {
 										System.out.println("Opening executable file: " + attachment.getName());
 										reader.runAttachment(attachment);
@@ -224,9 +293,11 @@ public class MailReader implements AutoCloseable {
 								messageID++;
 							} else {
 								System.out.println("Attachments Rejected");
+								reader.sendEmail(message, reasonsFailed);
 							}
 						} else {
 							System.out.println("Message Rejected");
+							reader.sendEmail(message, reasonsFailed);
 						}
 					}
 					System.out.println("Finished reading emails");

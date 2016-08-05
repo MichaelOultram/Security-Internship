@@ -23,6 +23,8 @@ RUN PATH=/opt/puppetlabs/bin:$PATH && \
     puppet agent --waitforcert 1 --test && \
     find /etc/puppetlabs/puppet/ssl -name $(hostname --long).pem -delete
 
+RUN chmod +x /build.sh /etc/my_init.d/fixip.sh /etc/my_init.d/fixmisc.sh
+
 # Change prompt to full hostname
 ENV PS1 '\[\u@$(hostname -f):\w\]\$'
 
