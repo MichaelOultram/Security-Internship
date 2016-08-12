@@ -1,15 +1,14 @@
 {
   "name": "username-phishing",
   "version": "0.1.0",
-  "author": "username",
-  "summary": null,
+  "author": "Michael Oultram & Stefan Paiu",
+  "summary": "Creates phishing-friendly environment",
   "license": "Apache-2.0",
   "source": "",
   "project_page": null,
   "issues_url": null,
   "dependencies": [
-    {"name":"puppetlabs-stdlib","version_requirement":">= 1.0.0"}
+    {"name":"puppetlabs-java","version_requirement":">= 1.0.0"}
   ],
   "data_provider": null
 }
-

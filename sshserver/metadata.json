@@ -1,12 +1,14 @@
 {
-  "name": "username-sshserver",
+  "name": "moultram-sshserver",
   "version": "0.1.0",
-  "author": "username",
-  "summary": null,
+  "author": "Michael Oultram",
+  "summary": "A very crude module to install an ssh server",
   "license": "Apache-2.0",
   "source": "",
   "project_page": null,
   "issues_url": null,
-  "dependencies": [],
+  "dependencies": [
+    {"version_requirement":">= 2.8.1","name":"saz-ssh"},
+  ],
   "data_provider": null
 }
