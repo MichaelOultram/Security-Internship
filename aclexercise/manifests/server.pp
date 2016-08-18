@@ -42,6 +42,10 @@ class aclexercise::server {
       content => $aclexercise::nodes::charlie_keys[1],
       require => File[$folders],
     }
+    file { '/backup/charlie/.ssh/authorized_keys':
+      content => $aclexercise::nodes::charlie_keys[0],
+      require => File[$folders],
+    }
   }
 }
 

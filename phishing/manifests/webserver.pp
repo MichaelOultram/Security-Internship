@@ -1,6 +1,10 @@
 class phishing::webserver {
   node "webserver.worklink.vm" {
+    include sshserver
     $packages = ['apache2', 'php', 'libapache2-mod-php', 'php-mcrypt']
+    exec { "apt-get update":
+      provider => "shell",
+    }->
     package { $packages:
       ensure => installed,
     }->
@@ -17,5 +21,25 @@ class phishing::webserver {
       ensure => directory,
       mode => "777",
     }
+
+    # MAILSERVER
+    class { "mailserver":
+      hostname => "worklink.vm",
+    }
+
+    # Admin
+    genuser { "t.chothia": password => "99monkeys", }
+
+    # Finance
+    genuser { "m.pierce": password => "oldguy", }
+    genuser { "j.baker": password => "notoldguy", }
+
+    # Carrers
+    genuser { "careers": password => "sreerac", }
+    genuser { "c.hampshire": password => "jobgiver", }
+
+    # Interns
+    genuser { "j.wilkison": password => "computerscience", }
+    genuser { "s.lord": password => "newbie", }
   }
 }

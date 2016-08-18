@@ -26,7 +26,8 @@ class metasploit($location = "/opt", $users = []) {
     require => Rvm_system_ruby['ruby-2.3.1'],
   }->
   file_line { "/etc/profile":
-    line => "export PATH=/opt/metasploit:$PATH",
+    path => "/etc/profile",
+    line => "export PATH=\$PATH:/opt/metasploit",
   }
 
   # Make sure all users are in the rvm group

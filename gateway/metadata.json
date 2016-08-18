@@ -1,8 +1,8 @@
 {
-  "name": "username-gateway",
+  "name": "moultram-gateway",
   "version": "0.1.0",
-  "author": "username",
-  "summary": null,
+  "author": "Michael Oultram",
+  "summary": "Configures iptables to be a gateway for a network",
   "license": "Apache 2.0",
   "source": "",
   "issues_url": null,

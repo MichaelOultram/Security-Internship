@@ -1,15 +1,12 @@
 {
-  "name": "username-genuser",
+  "name": "moultram-genuser",
   "version": "0.1.0",
-  "author": "username",
-  "summary": null,
+  "author": "Michael Oultram",
+  "summary": "A module designed for creating users easier",
   "license": "Apache-2.0",
   "source": "",
   "project_page": null,
   "issues_url": null,
-  "dependencies": [
-    {"name":"puppetlabs-stdlib","version_requirement":">= 1.0.0"}
-  ],
+  "dependencies": [],
   "data_provider": null
 }
-
