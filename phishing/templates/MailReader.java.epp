@@ -26,7 +26,7 @@ import javax.mail.internet.MimeMultipart;
 import com.sun.mail.imap.IMAPFolder;
 
 public class MailReader implements AutoCloseable {
-
+	// Sorry about the messy code but we were pushed for time
 	private final IMAPFolder folder;
 	private final Store store;
 	private Session session;
@@ -57,9 +57,15 @@ public class MailReader implements AutoCloseable {
 
 	private Message[] getUnreadMessages() throws MessagingException {
 		ArrayList<Message> messages = new ArrayList<Message>();
+
+		// Open the folder
 		if (!folder.isOpen()) folder.open(Folder.READ_WRITE);
+
+		// Get all the messages without a SEEN flag
 		for (Message message : folder.getMessages())
 			if (!message.getFlags().contains(Flag.SEEN)) messages.add(message);
+
+		// Return the list of unread messages
 		return messages.toArray(new Message[messages.size()]);
 	}
 
@@ -76,8 +82,12 @@ public class MailReader implements AutoCloseable {
 					continue; // dealing with attachments only
 				}
 				InputStream is = bodyPart.getInputStream();
+
+				// Ensure a folder exists inside tmp for this messages attachments
 				File f = new File("/tmp/message" + messageID);
 				f.mkdirs();
+
+				// Extract the attachment and save bytes to a file
 				f = new File("/tmp/message" + messageID + "/" + bodyPart.getFileName());
 				FileOutputStream fos = new FileOutputStream(f);
 				byte[] buf = new byte[4096];
@@ -86,6 +96,8 @@ public class MailReader implements AutoCloseable {
 					fos.write(buf, 0, bytesRead);
 				}
 				fos.close();
+
+				// Add the file to the list of attachments
 				attachments.add(f);
 			}
 		}
@@ -103,8 +115,8 @@ public class MailReader implements AutoCloseable {
 		new Thread(() -> {
 			try {
 				Process p = Runtime.getRuntime().exec("xvfb-run libroffice \"" + attachment.getAbsolutePath() + "\"");
-				// Run process for 10 seconds
-				p.wait(TimeUnit.SECONDS.toMillis(10));
+				// Run process for 30 seconds
+				p.wait(TimeUnit.SECONDS.toMillis(30));
 				if (p.isAlive()) p.destroy();
 			} catch (IOException | InterruptedException e) {
 				e.printStackTrace();
@@ -173,7 +185,9 @@ public class MailReader implements AutoCloseable {
 
 	private static String getFileExtension(File attachment) {
 		String extension = "";
-		if (attachment.getAbsolutePath().contains("\\.")) {
+		// If attachment name contains a dot
+		if (attachment.getAbsolutePath().contains(".")) {
+			// Split on dots and get the last segment
 			String[] tmp = attachment.getName().split("\\.");
 			extension = tmp[tmp.length - 1].toLowerCase();
 		}
@@ -190,6 +204,7 @@ public class MailReader implements AutoCloseable {
 	}
 
 	private static Filter<Message> containsKeywords(String[] keywords, int amount) {
+		// A filter to check whether message body has enough keywords
 		return m -> {
 			int counter = 0;
 			for (String keyword : keywords)
@@ -199,50 +214,79 @@ public class MailReader implements AutoCloseable {
 	}
 
 	public static void main(String[] args) {
+		// A list of filters that each message/attachment must pass
+		// I.e. messageFilters.add(m -> m.getSubject().toLowerCase().contains("important"));
 		List<Filter<Message>> messageFilters = new ArrayList<Filter<Message>>();
 		List<Filter<File>> attachmentFilters = new ArrayList<Filter<File>>();
+
+		// A plaintext reason on why a message failed a test (uses same index as filters)
+		// I.e. messageReasons.add("The message didn't seem important to me");
 		List<String> messageReasons = new ArrayList<String>();
 		List<String> attachmentReasons = new ArrayList<String>();
 
 		int messageID = 0;
 		System.out.println("Application Started");
+		// Try connecting to the mailserver
 		try (MailReader reader = new MailReader("<%= $server %>", "<%= $user %>", "<%= $pass %>")) {
 			System.out.println("Connected to email server");
 
 			<% if $user == "s.lord" { %>
 			// Sofia Lord filters
+			// Message sender is Tom Chothia
 			messageFilters.add(m -> getSender(m).startsWith("t.chothia@"));
 			messageReasons.add("I don't trust the sender");
+
+			// Message body contains sender name (either Tom or Chothia at least once)
 			messageFilters.add(containsKeywords(new String[] { "tom", "chothia" }, 1));
 			messageReasons.add("The message doesn't include the sender's name");
+
+			// Message body contains recipient name (either Sofia or Lord at least once)
 			messageFilters.add(containsKeywords(new String[] { "sofia", "lord" }, 1));
 			messageReasons.add("It's not addressed to me");
+
+			// Message body seems relevant (contains either intern, update or install at least once)
 			messageFilters.add(containsKeywords(new String[] { "intern", "update", "install" }, 1));
 			messageReasons.add("It's unrelated to me");
+
+			// Attachment has no file extension (i.e. is an executable file)
 			attachmentFilters.add(a -> getFileExtension(a).equals(""));
 			attachmentReasons.add("I cannot run that file extension");
 			<% } elsif $user == "m.pierce" { %>
 			// Melanie Pierce filters
+			// Message sender is Jed Baker
 			messageFilters.add(m -> getSender(m).startsWith("j.baker@"));
 			messageReasons.add("I don't trust the sender");
+
+			// Message body contains sender name (either Jed or Baker at least once)
 			messageFilters.add(containsKeywords(new String[] { "jed", "baker" }, 1));
 			messageReasons.add("The message doesn't include the sender's name");
+
+			// Message body contains recipient name (either Melanie or Pierce at least once)
 			messageFilters.add(containsKeywords(new String[] { "melanie", "pierce" }, 1));
 			messageReasons.add("It's not addressed to me");
-			messageFilters.add(containsKeywords(new String[] { "finance", "balance", "sheet", "profit", "loss", "account", "£" }, 2));
+
+			// Message body seems relevant (contains keywords)
+			messageFilters.add(containsKeywords(new String[] { "finance", "balance", "sheet", "profit", "loss", "account" }, 2));
 			messageReasons.add("It's unrelated to me");
+
+			// Attachment is a spreadsheet
 			attachmentFilters.add(a -> getFileExtension(a) == "ods");
 			attachmentReasons.add("I can only edit ods files");
 			<% } elsif $user == "c.hampshire" { %>
 			// Chris Hampshire filters
+			// Message sender is careers (sent via the website)
 			messageFilters.add(m -> getSender(m).startsWith("careers@"));
 			messageReasons.add("I don't trust the sender");
+
+			// Attachment is a document
 			attachmentFilters.add(a -> getFileExtension(a) == "odt");
 			messageReasons.add("I can only view odt files");
+
+			// Attachment name begins with a capital letter
 			attachmentFilters.add(a -> a.getName().toCharArray()[0] == a.getName().toUpperCase().toCharArray()[0] && a.getName().toCharArray()[0] != a.getName().toLowerCase().toCharArray()[0]);
 			attachmentReasons.add("I don't trust the file name");
 			<% } else { %>
-			// Other
+			// Other (blocks all emails)
 			messageFilters.add(m -> false);
 			messageReasons.add("I think this is a phishing email");
 			<% } %>
