@@ -1,8 +1,8 @@
 {
-  "name": "username-mailserver",
+  "name": "moultram-mailserver",
   "version": "0.1.0",
-  "author": "username",
-  "summary": null,
+  "author": "Michael Oultram",
+  "summary": "Installs and configures a postfix/dovecott server",
   "license": "Apache-2.0",
   "source": "",
   "project_page": null,
@@ -12,4 +12,3 @@
   ],
   "data_provider": null
 }
-

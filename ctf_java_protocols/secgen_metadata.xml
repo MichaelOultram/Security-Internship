@@ -6,9 +6,9 @@
   <name>CTF Java Communiation Protocols</name>
   <author>Michael Oultram, Paul Popa, Stefan Paui</author>
   <module_license>MIT</module_license>
-  <description>Installs some java communicaton protocosls that run on a prot inside of the VM. The protocols that are installed depend on how the ctf_java_protocols.pp file is configured, see the README for details on this. The protocols have a key that they will send to someone who completes the handshake correctly.
+  <description>Installs some java communicaton protocosls that run on a port inside of the VM. The protocols that are installed depend on how the ctf_java_protocols.pp file is configured, see the README for details on this. The protocols have a token that they will send to someone who completes the handshake correctly.
 
-When the module is installed a new user 'charlie' is created. Insude of this users home directory /home/charlie/ is the source code for the protocols that have been installed. This source code does not contain the token however.</description>
+When the module is installed a new user 'charlie' is created. Inside of this users home directory /home/charlie/ is the source code for the protocols that have been installed. This source code does not contain the token however.</description>
 
   <type>protocols</type>
   <privilege>root</privilege>
@@ -21,7 +21,7 @@ When the module is installed a new user 'charlie' is created. Insude of this use
   <!--<cve></cve>-->
   <cvss_base_score>1.5</cvss_base_score>
   <cvss_vector>AV:L/AC:M/Au:S/C:P/I:N/A:N</cvss_vector>
- 
+
   <software_name></software_name>
   <software_license></software_license>
 

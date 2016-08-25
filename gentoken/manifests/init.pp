@@ -1,7 +1,5 @@
-# Probably not needed
 class gentoken {
-  $packages = ["dmidecode"]
-  package { $packages:
+  package { "dmidecode":
     ensure => "installed",
   }
 }

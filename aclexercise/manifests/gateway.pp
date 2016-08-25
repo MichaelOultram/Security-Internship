@@ -1,6 +1,6 @@
 class aclexercise::gateway {
   node 'acl.vm' {
-    class { "gateway": }
+    include gateway
 
     gateway::forward_port { "001 server all ports":
       port => undef, # undef = All ports

@@ -1,0 +1,14 @@
+{
+  "name": "moultram-metasploit",
+  "version": "0.1.0",
+  "author": "Michael Oultram & Stefan Paiu",
+  "summary": "Basic module to install metasploit",
+  "license": "Apache-2.0",
+  "source": "",
+  "project_page": null,
+  "issues_url": null,
+  "dependencies": [
+    {"name":"maestrodev-rvm","version_requirement":">= 1.13.1"}
+  ],
+  "data_provider": null
+}
