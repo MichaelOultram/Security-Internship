@@ -25,7 +25,6 @@ The users/servers involved in this setup are the ones above. Here you have a wid
 
 ### Attacker
 
-
 ```
 
 ```
