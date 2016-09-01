@@ -1,7 +1,15 @@
 ## Example node definition
-This is the node definition I have been using to test this module. It creates a network called `example` and three containers which are put inside the network. The network is using a cidr of `172.18.0.0/24` meaning ip addresses range from `172.18.0.1` to `172.18.0.254`.
 
-One of the containers, `example.vm`, is also in the public network. This container is the gateway container and is configured to have the ip address `172.18.0.1` inside the example network. This is because all containers assume that their router is on the xxx.xxx.xxx.1 address. Inside `example.vm`'s node definition, we can see that some ports are forwarded.
+This is the node definition I have been using to test this module. It creates a
+network called `example` and three containers which are put inside the network.
+The network is using a cidr of `172.18.0.0/24` meaning ip addresses range from
+`172.18.0.1` to `172.18.0.254`.
+
+One of the containers, `example.vm`, is also in the public network. This
+container is the gateway container and is configured to have the ip address 
+`172.18.0.1` inside the example network. This is because all containers assume
+that their router is on the xxx.xxx.xxx.1 address. Inside `example.vm`'s node
+definition, we can see that some ports are forwarded.
 
 ```puppet
 node 'local.vm' {
